@@ -7,7 +7,7 @@ import java.util.*;
 public class Main {
     public static Scanner input = new Scanner(System.in);
     public static ArrayList<Product> allProducts = new ArrayList<>(); // ArrayList allProducts
-    public static ArrayList<Product> shoppingCart = new ArrayList<>();
+    private static List<CartItem> shoppingCart = new ArrayList<>();
     public static void main(String[] args) {
 
         boolean isAdmin = false; // isAdmin
@@ -138,13 +138,33 @@ public class Main {
 
 
     // Ta bort fr varukorgen // måste byggas?
-    public static void removeFromShoppingcart() {}
+    // Ta bort från varukorgen
+    public static void removeFromShoppingCart() {
+        displayShoppingCart(); // Visa först varukorgen
+        System.out.println("Vilken vara vill du ta bort (ange namnet): ");
+        String productName = UserInput.readString();
+
+        CartItem toRemove = null;
+        for (CartItem item : shoppingCart) {
+            if (item.getProduct().getName().equalsIgnoreCase(productName)) {
+                toRemove = item;
+                break;
+            }
+        }
+        if (toRemove != null) {
+            shoppingCart.remove(toRemove);
+            System.out.println(productName + " har tagits bort från varukorgen.");
+        } else {
+            System.out.println("Varan hittades inte i varukorgen.");
+        }
+    }
+
 
     // 4. Visa Varukorg och kunna ta bort en vara // måste byggas
     public static void displayShoppingCart() {
         if (!shoppingCart.isEmpty()) {
-            for (Product product : shoppingCart) {
-                System.out.println(product);
+            for (CartItem item : shoppingCart) {
+                System.out.println(item);
             }
         } else {
             System.out.println("Kundkorgen är tom.");
@@ -316,22 +336,31 @@ public class Main {
             }
         }
         if (productToCheck != null) {
+            double quantity = 0;
+
+            // Fråga användaren efter kvantiteten beroende på om det är en vikt- eller styckprisprodukt
             if (productToCheck.isWeightPrice()) {
-                weightPrice(productToCheck);
+                System.out.println("Ange vikten du önskar köpa (i kg): ");
+                quantity = UserInput.readDouble();
             } else {
-                unitPrice(productToCheck);
+                System.out.println("Ange antalet enheter du önskar köpa: ");
+                quantity = UserInput.readInt();
             }
-            // Vill användaren lägga till produkten i varukorgen?
+
+            // Fråga om användaren vill lägga till produkten i varukorgen
             System.out.println("Vill du lägga till denna produkt i din varukorg? (j/n): ");
             String answer = UserInput.readString();
             if (answer.equalsIgnoreCase("j")) {
-                shoppingCart.add(productToCheck);
+                // Skapa ett nytt CartItem objekt med produkten och kvantiteten
+                CartItem newItem = new CartItem(productToCheck, quantity);
+                shoppingCart.add(newItem);
                 System.out.println(UserInput.capitalize(productToCheck.getName()) + " har lagts till i varukorgen.");
             }
         } else {
             System.out.println("Produkten kunde inte hittas.");
         }
     }
+
 
 
     public static void weightPrice(Product productToCheck) {
@@ -405,8 +434,16 @@ public class Main {
         String categoryInput = input.nextLine().toUpperCase();
         return (categoryInput).split(",");
     }
-    // Skapa metod för discount "köp två betala för en"
-    // Skapa metod för discount "över 2 kg lägre kilopris"
+    public static void applyBuyTwoGetOneFreeDiscount(Product product) {
+        // Check if the quantity of the product is eligible for the discount
+        // If eligible, adjust the total price accordingly
+    }
+
+    public static void applyBulkDiscount(Product product, double weight) {
+        // If the weight exceeds 2 kg, apply a lower price per kilo to the product
+        // Adjust the total price based on the new price per kilo
+    }
+
 
 
 
