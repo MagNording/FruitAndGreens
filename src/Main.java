@@ -122,19 +122,22 @@ public class Main {
         return false;
     }
     public static boolean searchByProductGroup(String searchTerm) {
+        boolean productFound = false; // Flagga för att hålla reda på om någon produkt har hittats
+
         for (Product product : allProducts) {
             String[] productGroup = product.getProductGroup();
             if (productGroup != null) {
                 for (String group : productGroup) {
                     if (group.toLowerCase().contains(searchTerm)) {
                         System.out.println(product);
-                        return true;
+                        productFound = true; // Sätter flaggan till true om en produkt hittas
                     }
                 }
             }
         }
-        return false;
+        return productFound;
     }
+
 
     // Ta bort fr varukorgen // måste byggas?
     // Ta bort från varukorgen
