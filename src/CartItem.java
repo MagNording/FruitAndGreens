@@ -35,7 +35,7 @@ public class CartItem {
 
     @Override
     public String toString() {
-        // Modifiera denna strängrepresentation för att inkludera all den information du vill visa för varje CartItem
+        // Ändra denna toString för att inkludera all den information du vill visa för varje CartItem
         return String.format("Produkt: %s, Kvantitet: %.2f, Totalpris: %.2f kr",
                 product.getName(), quantity, totalPrice);
     }
