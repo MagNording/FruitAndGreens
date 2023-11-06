@@ -349,7 +349,6 @@ public class Main {
         Product productToCheck = null;
         System.out.println("Ange sökterm: ");
         String searchTerm = UserInput.readString();
-
         for (Product product : allProducts) {
             if (product.getName().toLowerCase().contains(searchTerm.toLowerCase())) {
                 productToCheck = product;
@@ -368,7 +367,6 @@ public class Main {
                 System.out.println("Ange antalet enheter du önskar köpa: ");
                 quantity = UserInput.readInt();
             }
-
             // Fråga om användaren vill lägga till produkten i varukorgen
             System.out.println("Vill du lägga till denna produkt i din varukorg? (j/n): ");
             String answer = UserInput.readString();
