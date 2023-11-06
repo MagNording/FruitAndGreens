@@ -1,4 +1,5 @@
 // magnus.nording@iths.se
+import java.util.Objects;
 
 public class Product {
     private String name;
@@ -46,6 +47,18 @@ public class Product {
         }
         return String.format("Produkt: %-10s %s: %.2f Varugrupp: %-20s%s",
                 name, priceType, price, productGroupStr, promotionInfo);
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Product product = (Product) o;
+        return Objects.equals(name, product.name);
+    }
+
+    public int hashCode() {
+        return Objects.hashCode(name);
     }
 
     public int getQuantity() {

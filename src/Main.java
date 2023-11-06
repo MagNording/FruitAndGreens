@@ -88,45 +88,46 @@ public class Main {
     public static void searchProduct() {
         if (allProducts.isEmpty()) {
             System.out.println("Produktlistan är tom.");
-        } else {
-            boolean returnToMenu = false;
-            do {
-                System.out.println("Ange sökterm: ");
-                String searchTerm = UserInput.readString();
-                boolean productFound = false;
+            return;
+        }
+        System.out.println("Vill du söka på:");
+        System.out.println("1. Produktnamn");
+        System.out.println("2. Varugrupp");
+        int searchType = UserInput.readInt();
 
-                for (Product product : allProducts) {
-                    if (productMatchesSearchTerm(product, searchTerm)) {
-                        System.out.println(product);
-                        productFound = true;
-                        break;
-                    }
-                }
-                if (productFound) {
-                    returnToMenu = true;
-                }
-                else {
-                    System.out.println("Produkten hittades inte.");
-                    System.out.println("Välj en åtgärd:");
-                    System.out.println("1. Försök igen");
-                    System.out.println("2. Tillbaka till menyn");
-                    int choice = UserInput.readInt();
-                    if (choice == 2) {
-                        returnToMenu = true;
-                    }
-                }
-            } while (!returnToMenu);
+        System.out.println("Ange sökterm: ");
+        String searchTerm = UserInput.readString().toLowerCase();
+
+        boolean productFound = false;
+
+        switch (searchType) {
+            // Sökning på produktnamn
+            case 1 -> productFound = searchByProductName(searchTerm);
+            // Sökning på varugrupp
+            case 2 -> productFound = searchByProductGroup(searchTerm);
+            default -> {System.out.println("Ogiltigt val, försök igen.");
+                return;}
+        }
+        if (!productFound) {
+            System.out.println("Ingen produkt hittades med angiven sökterm.");
         }
     }
-
-    public static boolean productMatchesSearchTerm(Product product, String searchTerm) {
-        if (product.getName().toLowerCase().contains(searchTerm.toLowerCase())) {
-            return true;
-        } else {
+    public static boolean searchByProductName(String searchTerm) {
+        for (Product product : allProducts) {
+            if (product.getName().toLowerCase().contains(searchTerm)) {
+                System.out.println(product);
+                return true;
+            }
+        }
+        return false;
+    }
+    public static boolean searchByProductGroup(String searchTerm) {
+        for (Product product : allProducts) {
             String[] productGroup = product.getProductGroup();
             if (productGroup != null) {
                 for (String group : productGroup) {
-                    if (group.toLowerCase().contains(searchTerm.toLowerCase())) {
+                    if (group.toLowerCase().contains(searchTerm)) {
+                        System.out.println(product);
                         return true;
                     }
                 }
@@ -134,8 +135,6 @@ public class Main {
         }
         return false;
     }
-
-
 
     // Ta bort fr varukorgen // måste byggas?
     // Ta bort från varukorgen
@@ -214,15 +213,23 @@ public class Main {
     // Lägg till en produkt
     public static void addNewProduct() {
         String nameInput = getProductName();
+        // Kontrollera direkt om produktnamnet redan finns i listan
+        for (Product existingProduct : allProducts) {
+            if (existingProduct.getName().equalsIgnoreCase(nameInput)) {
+                System.out.println("En produkt med namnet \"" + nameInput + "\" finns redan i listan.");
+                return; // Avslutar metoden tidigt om produkten redan finns
+            }
+        }
+        // Om produktnamnet inte finns, fortsätt
         double priceInput = getProductPrice();
         String[] categoryArray = getProductCategories();
         boolean isWeightPrice = getProductPriceType();
-
+        // Skapa och lägg till den nya produkten i listan
         Product product = new Product(nameInput, priceInput, categoryArray, isWeightPrice);
         allProducts.add(product);
-
         System.out.println(product.getName() + " har lagts till.");
     }
+
 
     // Ta bort en produkt
     public static void removeProduct() {
@@ -338,7 +345,7 @@ public class Main {
         if (productToCheck != null) {
             double quantity = 0;
 
-            // Fråga användaren efter kvantiteten beroende på om det är en vikt- eller styckprisprodukt
+            // Fråga användaren efter kvantiteten beroende på om vikt- eller styckprisprodukt
             if (productToCheck.isWeightPrice()) {
                 System.out.println("Ange vikten du önskar köpa (i kg): ");
                 quantity = UserInput.readDouble();
@@ -439,8 +446,8 @@ public class Main {
         // If eligible, adjust the total price accordingly
     }
 
-    public static void applyBulkDiscount(Product product, double weight) {
-        // If the weight exceeds 2 kg, apply a lower price per kilo to the product
+    public static void applyPercentageDiscount(Product product, double weight) {
+        // If the weight exceeds 2 kg, apply 15 % lower price per kilo to the product
         // Adjust the total price based on the new price per kilo
     }
 
