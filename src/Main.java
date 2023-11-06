@@ -194,15 +194,15 @@ public class Main {
             System.out.println("Kunde inte hitta filen tyvärr.");
         }
         do {
-            System.out.println("Ange användarnamn > ");
+            System.out.print("Ange användarnamn > ");
             String usernameInput = UserInput.readString();
-            System.out.println("Ange lösenord > ");
+            System.out.print("Ange lösenord > ");
             String passwordInput = UserInput.readString();
 
             // Jämför användarnamn och lösenord med de som lästs in från filen
             if (usernameInput.equals(userDataFromFile.get(0)) &&
                     passwordInput.equals(userDataFromFile.get(1))) {
-                System.out.println("Du är nu inloggad!");
+                System.out.println("Du är nu inloggad.");
                 loggedIn = true;
                 return true;
             } else {
@@ -233,31 +233,36 @@ public class Main {
         System.out.println(product.getName() + " har lagts till.");
     }
 
-
     // Ta bort en produkt
     public static void removeProduct() {
         System.out.println("Ange produkten du vill ta bort: ");
         String productToRemove = UserInput.readString();
         if (productToRemove.isEmpty()) {
             System.out.println("Ingen produkt angiven. Ingen ändring har gjorts.");
-            System.out.println("Välj 2. Ange exakt produktnamn.");
             return;
         }
-        boolean removed = false;
         Iterator<Product> iterator = allProducts.iterator();
 
         while (iterator.hasNext()) {
             Product product = iterator.next();
             String productName = product.getName();
 
-            if (productName.equalsIgnoreCase(productToRemove)) {
-                iterator.remove();
-                removed = true;
+            if (productName.toLowerCase().startsWith(productToRemove.toLowerCase())) {
+                System.out.println(product);
+                System.out.println("Är du säker på att du vill ta bort produkten? (j/n): ");
+                String confirmation = UserInput.readString();
+
+                if (confirmation.equalsIgnoreCase("j")) {
+                    iterator.remove();
+                    System.out.println(UserInput.capitalize(productName) + " har tagits bort.");
+                    break;
+                } else {
+                    System.out.println("Ingen produkt har tagits bort.");
+                    return;
+                }
             }
         }
-        if (removed) {
-            System.out.println(UserInput.capitalize(productToRemove) + " har tagits bort.");
-        } else {
+        if (!iterator.hasNext()) {
             System.out.println("Ingen matchande produkt hittades.");
         }
     }
