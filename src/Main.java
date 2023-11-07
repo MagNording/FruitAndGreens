@@ -17,8 +17,7 @@ public class Main {
         System.out.println("-----------------------");
         System.out.println("Programmet startas.\n");
 
-        allProducts.add(new Product("Nektarin", 10, new String[]{"STENFRUKT", "FRUKT"}, false,
-                7.5, "Två för 15"));
+        allProducts.add(new Product("Nektarin", 10, new String[]{"STENFRUKT", "FRUKT"}, false));
         allProducts.add(new Product("Morot", 16.48, new String[]{"ROTFRUKT", "GRÖNSAK"}, true));
         allProducts.add(new Product("Broccoli", 18.83, new String[]{"KÅL", "GRÖNSAK"}, true));
 
@@ -192,7 +191,7 @@ public class Main {
             for (CartItem item : shoppingCart) {
                 System.out.println(item);
             }
-            System.out.println(new String(new char[50]).replace("\0", "-"));
+            System.out.println(new String(new char[75]).replace("\0", "-"));
             displayCartSummary();
         } else {
             System.out.println("Varukorgen är tom.");

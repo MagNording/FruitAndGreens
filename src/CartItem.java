@@ -34,7 +34,6 @@ public class CartItem {
                 product.getPrice();
         return product.isWeightPrice() ? price * quantity : price * (int)quantity;
     }
-
     @Override
     public String toString() {
         // Bestämmer enheten baserat på om priset är per vikt eller styck.
