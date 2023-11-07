@@ -381,28 +381,6 @@ public class Main {
         }
     }
 
-    public static void weightPrice(Product productToCheck) {
-        System.out.println("Ange vikten: ");
-        double weightInput = UserInput.readDouble();
-
-        // Använd priset från produkten
-        double priceInput = productToCheck.getPrice();
-        double result = priceInput * weightInput;
-
-        System.out.printf("Priset för %.2f kg: %.2f kr.\n", weightInput, result);
-    }
-
-    public static void unitPrice(Product productToCheck) {
-        System.out.print("Ange antalet enheter: ");
-        int numOfUnits = UserInput.readInt();
-
-        // Använd priset från produkten
-        double pricePerUnit = productToCheck.getPrice();
-        double result = pricePerUnit * numOfUnits;
-
-        System.out.printf("Priset för %d st: %.2f kr.\n", numOfUnits, result);
-    }
-
     public static String getProductName() {
         String nameInput;
         while (true) {
@@ -449,7 +427,29 @@ public class Main {
     }
 
     public static void applyPercentageDiscount(Product product, double weight) {
-        // Om vikten överskrider 2 kg, lägg då ett 15 % lägre kilopris på produkten
-        // Justera totala priset baserat på nya pris/kg
+        // lägg ett 15 % lägre kilopris på produkten
+        // Justera totala priset baserat på nya pris/kg el. pris/enhet
+    }
+    // ??
+    public static void weightPrice(Product productToCheck) {
+        System.out.println("Ange vikten: ");
+        double weightInput = UserInput.readDouble();
+
+        // Använd priset från produkten
+        double priceInput = productToCheck.getPrice();
+        double result = priceInput * weightInput;
+
+        System.out.printf("Priset för %.2f kg: %.2f kr.\n", weightInput, result);
+    }
+    // ??
+    public static void unitPrice(Product productToCheck) {
+        System.out.print("Ange antalet enheter: ");
+        int numOfUnits = UserInput.readInt();
+
+        // Använd priset från produkten
+        double pricePerUnit = productToCheck.getPrice();
+        double result = pricePerUnit * numOfUnits;
+
+        System.out.printf("Priset för %d st: %.2f kr.\n", numOfUnits, result);
     }
 }
