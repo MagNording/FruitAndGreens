@@ -8,7 +8,6 @@ public class Product {
     private boolean isWeightPrice;
     private double promotionPrice;
     private String promotionTerms;
-    private int quantity;
     private boolean isPromotionActive; // promotion status
 
 
@@ -59,14 +58,6 @@ public class Product {
 
     public int hashCode() {
         return Objects.hashCode(name);
-    }
-
-    public int getQuantity() {
-        return this.quantity;
-    }
-
-    public void setQuantity(int quantity) {
-        this.quantity = quantity;
     }
 
     public boolean isPromotionActive() {

@@ -7,7 +7,7 @@ import java.util.*;
 public class Main {
     public static Scanner input = new Scanner(System.in);
     public static ArrayList<Product> allProducts = new ArrayList<>(); // ArrayList allProducts
-    private static List<CartItem> shoppingCart = new ArrayList<>();
+    static List<CartItem> shoppingCart = new ArrayList<>();
     public static void main(String[] args) {
 
         boolean isAdmin = false; // isAdmin
@@ -196,10 +196,21 @@ public class Main {
             for (CartItem item : shoppingCart) {
                 System.out.println(item);
             }
+            // Visa en sammanfattning längst ner
+            displayCartSummary();
         } else {
-            System.out.println("Kundkorgen är tom.");
+            System.out.println("Varukorgen är tom.");
         }
+    }
 
+    public static void displayCartSummary() {
+        double totalWeight = 0;
+        double totalPrice = 0;
+        for (CartItem item : shoppingCart) {
+            totalWeight += item.getQuantity();
+            totalPrice += item.getTotalPrice();
+        }
+        System.out.printf("Total vikt/antal enheter: %.2f\nTotalpris: %.2f kr\n", totalWeight, totalPrice);
     }
 
     // 6. Ta bort en produkt
@@ -344,37 +355,50 @@ public class Main {
         }
     }
 
-    // Varukorg?
-    public static void addToShoppingCart() {
-        Product productToCheck = null;
-        System.out.println("Ange sökterm: ");
-        String searchTerm = UserInput.readString();
-        for (Product product : allProducts) {
-            if (product.getName().toLowerCase().contains(searchTerm.toLowerCase())) {
-                productToCheck = product;
-                System.out.println(product);
-                break;
+    public static CartItem findCartItemByProduct(Product product) {
+        for (CartItem item : shoppingCart) {
+            if (item.getProduct().equals(product)) {
+                return item;
             }
         }
-        if (productToCheck != null) {
-            double quantity = 0;
+        return null;
+    }
 
-            // Fråga användaren efter kvantiteten beroende på om vikt- eller styckprisprodukt
-            if (productToCheck.isWeightPrice()) {
-                System.out.println("Ange vikten du önskar köpa (i kg): ");
-                quantity = UserInput.readDouble();
-            } else {
-                System.out.println("Ange antalet enheter du önskar köpa: ");
-                quantity = UserInput.readInt();
-            }
+    // Varukorg?
+    public static void addToShoppingCart() {
+        System.out.println("Ange sökterm: ");
+        String searchTerm = UserInput.readString();
+        Product productToCheck = allProducts.stream()
+                .filter(product -> product.getName().toLowerCase().contains(searchTerm.toLowerCase()))
+                .findFirst()
+                .orElse(null);
+
+        if (productToCheck != null) {
+            System.out.println(productToCheck);
+
+            // Fråga användaren efter kvantiteten
+            System.out.println("Ange " + (productToCheck.isWeightPrice() ? "vikten du önskar köpa (i kg): " : "antalet enheter du önskar köpa: "));
+            double quantity = productToCheck.isWeightPrice() ? UserInput.readDouble() : UserInput.readInt();
+
             // Fråga om användaren vill lägga till produkten i varukorgen
             System.out.println("Vill du lägga till denna produkt i din varukorg? (j/n): ");
-            String answer = UserInput.readString();
-            if (answer.equalsIgnoreCase("j")) {
-                // Skapa ett nytt CartItem objekt med produkten och kvantiteten
-                CartItem newItem = new CartItem(productToCheck, quantity);
-                shoppingCart.add(newItem);
-                System.out.println(UserInput.capitalize(productToCheck.getName()) + " har lagts till i varukorgen.");
+            if (UserInput.readString().equalsIgnoreCase("j")) {
+                CartItem existingItem = findCartItemByProduct(productToCheck);
+                if (existingItem != null) {
+                    existingItem.setQuantity(existingItem.getQuantity() + quantity);
+                    // Beräkna det nya totalpriset och uppdatera det befintliga CartItem
+                    double additionalPrice = CartItem.calculatePrice(productToCheck, quantity);
+                    existingItem.setTotalPrice(existingItem.getTotalPrice() + additionalPrice);
+                    System.out.println("Kvantiteten för " + productToCheck.getName() + " har uppdaterats i varukorgen.");
+                } else {
+                    // Lägg till en ny produkt i varukorgen
+                    CartItem newItem = new CartItem(productToCheck, quantity);
+                    shoppingCart.add(newItem);
+                    System.out.println(UserInput.capitalize(productToCheck.getName()) + " har lagts till i varukorgen.");
+                }
+
+                // Visa totalpriset för varukorgen
+                displayCartTotalPrice();
             }
         } else {
             System.out.println("Produkten kunde inte hittas.");
@@ -430,26 +454,12 @@ public class Main {
         // lägg ett 15 % lägre kilopris på produkten
         // Justera totala priset baserat på nya pris/kg el. pris/enhet
     }
-    // ??
-    public static void weightPrice(Product productToCheck) {
-        System.out.println("Ange vikten: ");
-        double weightInput = UserInput.readDouble();
 
-        // Använd priset från produkten
-        double priceInput = productToCheck.getPrice();
-        double result = priceInput * weightInput;
-
-        System.out.printf("Priset för %.2f kg: %.2f kr.\n", weightInput, result);
-    }
-    // ??
-    public static void unitPrice(Product productToCheck) {
-        System.out.print("Ange antalet enheter: ");
-        int numOfUnits = UserInput.readInt();
-
-        // Använd priset från produkten
-        double pricePerUnit = productToCheck.getPrice();
-        double result = pricePerUnit * numOfUnits;
-
-        System.out.printf("Priset för %d st: %.2f kr.\n", numOfUnits, result);
+    public static void displayCartTotalPrice() {
+        double total = 0;
+        for (CartItem item : shoppingCart) {
+            total += item.getTotalPrice();
+        }
+        System.out.printf("Totalpris för varukorgen: %.2f kr\n", total);
     }
 }
