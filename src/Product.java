@@ -63,7 +63,6 @@ public class Product {
     public boolean isPromotionActive() {
         return this.isPromotionActive;
     }
-
     public void setPromotionActive(boolean isPromotionActive) {
         this.isPromotionActive = isPromotionActive;
     }
@@ -71,7 +70,6 @@ public class Product {
     public String getName() {
         return this.name;
     }
-
     public void setName(String name) {
         this.name = name;
     }
@@ -79,7 +77,6 @@ public class Product {
     public double getPrice() {
         return this.price;
     }
-
     public void setPrice(double price) {
         this.price = price;
     }
@@ -87,11 +84,12 @@ public class Product {
     public String[] getProductGroup() {
         return productGroup;
     }
-
+    public void setProductGroup(String[] productGroup) {
+        this.productGroup = productGroup;
+    }
     public double getPromotionPrice() {
         return promotionPrice;
     }
-
     public void setPromotionPrice(double promotionPrice) {
         if (promotionPrice > 0) {
             this.isPromotionActive = true;
@@ -102,19 +100,13 @@ public class Product {
     public String getPromotionTerms() {
         return promotionTerms;
     }
-
     public void setPromotionTerms(String promotionTerms) {
         this.promotionTerms = promotionTerms;
-    }
-
-    public void setProductGroup(String[] productGroup) {
-        this.productGroup = productGroup;
     }
 
     public boolean isWeightPrice() {
         return isWeightPrice;
     }
-
     public void setWeightPrice(boolean weightPrice) {
         isWeightPrice = weightPrice;
     }

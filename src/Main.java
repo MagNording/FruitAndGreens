@@ -27,6 +27,7 @@ public class Main {
             displayMenu();
             System.out.print("Ange ditt menyval: ");
             int menuChoice = UserInput.readInt();
+            System.out.println();
 
             switch (menuChoice) {
                 case 0 -> exitMenu = true;
@@ -43,6 +44,7 @@ public class Main {
                 case 7 -> { if (isAdmin) { updateProduct();
                 } else { printAdminOnly();}}
                 case 8 -> isAdmin = adminLogin();
+                default -> System.out.println("Ogiltigt val, välj mellan 0 - 8.");
             }
             System.out.println();
         } while (!exitMenu);
@@ -62,7 +64,7 @@ public class Main {
                 "3. Lägg till vara i varukorgen.",
                 "4. Visa Varukorg.",
                 "5. (ADMIN) Lägg till en produkt.",
-                "6. (ADMIM) Ta bort en produkt.",
+                "6. (ADMIN) Ta bort en produkt.",
                 "7. (ADMIN) Uppdatera produktinfo.",
                 "8. Logga in som Admin."
         };
@@ -143,30 +145,70 @@ public class Main {
         return productFound;
     }
 
+    // 3. Lägg till i varukorgen
+    public static void addToShoppingCart() {
+        System.out.println("Ange sökterm: ");
+        String searchTerm = UserInput.readString();
+        Product productToCheck = allProducts.stream()
+                .filter(product -> product.getName().toLowerCase().contains(searchTerm.toLowerCase()))
+                .findFirst()
+                .orElse(null);
 
-    // Ta bort fr varukorgen // måste byggas?
-    // Ta bort från varukorgen
-    public static void removeFromShoppingCart() {
-        displayShoppingCart(); // Visa först varukorgen
-        System.out.println("Vilken vara vill du ta bort (ange namnet): ");
-        String productName = UserInput.readString();
+        if (productToCheck != null) {
+            System.out.println(productToCheck);
 
-        CartItem toRemove = null;
-        for (CartItem item : shoppingCart) {
-            if (item.getProduct().getName().equalsIgnoreCase(productName)) {
-                toRemove = item;
-                break;
+            // Fråga användaren efter kvantiteten
+            System.out.println("Ange " + (productToCheck.isWeightPrice() ? "vikten du önskar köpa (i kg): " : "antalet enheter du önskar köpa: "));
+            double quantity = productToCheck.isWeightPrice() ? UserInput.readDouble() : UserInput.readInt();
+
+            // Fråga om användaren vill lägga till produkten i varukorgen
+            System.out.println("Vill du lägga till denna produkt i din varukorg? (j/n): ");
+            if (UserInput.readString().equalsIgnoreCase("j")) {
+                CartItem existingItem = findCartItemByProduct(productToCheck);
+                if (existingItem != null) {
+                    existingItem.setQuantity(existingItem.getQuantity() + quantity);
+                    // Beräkna det nya totalpriset och uppdatera det befintliga CartItem
+                    double additionalPrice = CartItem.calculatePrice(productToCheck, quantity);
+                    existingItem.setTotalPrice(existingItem.getTotalPrice() + additionalPrice);
+                    System.out.println("Kvantiteten för " + productToCheck.getName() + " har uppdaterats i varukorgen.");
+                } else {
+                    // Lägg till en ny produkt i varukorgen
+                    CartItem newItem = new CartItem(productToCheck, quantity);
+                    shoppingCart.add(newItem);
+                    System.out.println(UserInput.capitalize(productToCheck.getName()) + " har lagts till i varukorgen.");
+                }
+
+                // Visa totalpriset för varukorgen
+                displayCartTotalPrice();
             }
-        }
-        if (toRemove != null) {
-            shoppingCart.remove(toRemove);
-            System.out.println(productName + " har tagits bort från varukorgen.");
         } else {
-            System.out.println("Varan hittades inte i varukorgen.");
+            System.out.println("Produkten kunde inte hittas.");
         }
     }
 
-    // 3. Lägg till en produkt
+    // 4. Visa varukorg
+    public static void displayShoppingCart() {
+        if (!shoppingCart.isEmpty()) {
+            for (CartItem item : shoppingCart) {
+                System.out.println(item);
+            }
+            System.out.println(new String(new char[50]).replace("\0", "-"));
+            displayCartSummary();
+        } else {
+            System.out.println("Varukorgen är tom.");
+        }
+    }
+
+    public static void displayCartSummary() {
+        double totalPrice = 0;
+        for (CartItem item : shoppingCart) {
+            totalPrice += item.getTotalPrice();
+        }
+        totalPrice = CartItem.roundToNearestHalf(totalPrice);
+        System.out.printf("Totalpris: %.2f kr\n", totalPrice);
+    }
+
+    // 5. Lägg till en produkt
     public static void addNewProduct() {
         String nameInput = getProductName();
         // Kontrollera direkt om produktnamnet redan finns i listan
@@ -185,32 +227,6 @@ public class Main {
         Product product = new Product(nameInput, priceInput, categoryArray, isWeightPrice);
         allProducts.add(product);
         System.out.println(product.getName() + " har lagts till.");
-    }
-
-    // 4. Visa Varukorg och kunna ta bort en vara // måste byggas
-    // Visa innehållet i varukorgen och totalpriset
-    // Loopa igenom shoppingCart och itemPrices för att visa varorna och priserna
-    // Beräkna det totala priset baserat på innehållet i varukorgen
-    public static void displayShoppingCart() {
-        if (!shoppingCart.isEmpty()) {
-            for (CartItem item : shoppingCart) {
-                System.out.println(item);
-            }
-            // Visa en sammanfattning längst ner
-            displayCartSummary();
-        } else {
-            System.out.println("Varukorgen är tom.");
-        }
-    }
-
-    public static void displayCartSummary() {
-        double totalWeight = 0;
-        double totalPrice = 0;
-        for (CartItem item : shoppingCart) {
-            totalWeight += item.getQuantity();
-            totalPrice += item.getTotalPrice();
-        }
-        System.out.printf("Total vikt/antal enheter: %.2f\nTotalpris: %.2f kr\n", totalWeight, totalPrice);
     }
 
     // 6. Ta bort en produkt
@@ -335,22 +351,31 @@ public class Main {
                 System.out.print("Vill du aktivera kampanjen? (j/n): ");
                 boolean isCampaignActive = UserInput.readString().equalsIgnoreCase("j");
                 product.setPromotionActive(isCampaignActive);
-                System.out.print("Ange det nya kampanjpriset: ");
-                double newPromotionPrice = UserInput.readDouble();
-                product.setPromotionPrice(newPromotionPrice);
-                System.out.println("Kampanjpriset har uppdaterats.");
+                if (isCampaignActive) {
+                    System.out.print("Ange det nya kampanjpriset: ");
+                    double newPromotionPrice = UserInput.readDouble();
+                    product.setPromotionPrice(newPromotionPrice);
+                    System.out.println("Kampanjpriset har uppdaterats.");
+                } else {
+                    product.setPromotionPrice(0); // Nollställ kampanjpriset om kampanjen är inaktiv
+                }
                 String status = isCampaignActive ? "aktiverad" : "deaktiverad";
-                System.out.println("Kampanjen har blivit " + status + ".");}
+                System.out.println("Kampanjen har blivit " + status + ".");
+                updateCartForPromotions(); // Uppdaterar varukorgen med det nya kampanjpriset
+            }
             case 2 -> {
                 System.out.print("Ange det nya kampanjpriset: ");
                 double newPromotionPrice = UserInput.readDouble();
                 product.setPromotionPrice(newPromotionPrice);
-                System.out.println("Kampanjpriset har uppdaterats.");}
+                System.out.println("Kampanjpriset har uppdaterats.");
+                updateCartForPromotions(); // Uppdaterar varukorgen med det nya kampanjpriset
+            }
             case 3 -> {
                 System.out.print("Ange de nya kampanjvillkoren: ");
                 String newPromotionTerms = UserInput.readString();
                 product.setPromotionTerms(newPromotionTerms);
-                System.out.println("Kampanjvillkoren har uppdaterats.");}
+                System.out.println("Kampanjvillkoren har uppdaterats.");
+            }
             default -> System.out.println("Ogiltigt val. Ange ett nummer mellan 1 och 3.");
         }
     }
@@ -362,47 +387,6 @@ public class Main {
             }
         }
         return null;
-    }
-
-    // Varukorg?
-    public static void addToShoppingCart() {
-        System.out.println("Ange sökterm: ");
-        String searchTerm = UserInput.readString();
-        Product productToCheck = allProducts.stream()
-                .filter(product -> product.getName().toLowerCase().contains(searchTerm.toLowerCase()))
-                .findFirst()
-                .orElse(null);
-
-        if (productToCheck != null) {
-            System.out.println(productToCheck);
-
-            // Fråga användaren efter kvantiteten
-            System.out.println("Ange " + (productToCheck.isWeightPrice() ? "vikten du önskar köpa (i kg): " : "antalet enheter du önskar köpa: "));
-            double quantity = productToCheck.isWeightPrice() ? UserInput.readDouble() : UserInput.readInt();
-
-            // Fråga om användaren vill lägga till produkten i varukorgen
-            System.out.println("Vill du lägga till denna produkt i din varukorg? (j/n): ");
-            if (UserInput.readString().equalsIgnoreCase("j")) {
-                CartItem existingItem = findCartItemByProduct(productToCheck);
-                if (existingItem != null) {
-                    existingItem.setQuantity(existingItem.getQuantity() + quantity);
-                    // Beräkna det nya totalpriset och uppdatera det befintliga CartItem
-                    double additionalPrice = CartItem.calculatePrice(productToCheck, quantity);
-                    existingItem.setTotalPrice(existingItem.getTotalPrice() + additionalPrice);
-                    System.out.println("Kvantiteten för " + productToCheck.getName() + " har uppdaterats i varukorgen.");
-                } else {
-                    // Lägg till en ny produkt i varukorgen
-                    CartItem newItem = new CartItem(productToCheck, quantity);
-                    shoppingCart.add(newItem);
-                    System.out.println(UserInput.capitalize(productToCheck.getName()) + " har lagts till i varukorgen.");
-                }
-
-                // Visa totalpriset för varukorgen
-                displayCartTotalPrice();
-            }
-        } else {
-            System.out.println("Produkten kunde inte hittas.");
-        }
     }
 
     public static String getProductName() {
@@ -454,6 +438,18 @@ public class Main {
         // lägg ett 15 % lägre kilopris på produkten
         // Justera totala priset baserat på nya pris/kg el. pris/enhet
     }
+
+    public static void updateCartForPromotions() {
+        for (CartItem item : shoppingCart) {
+            Product product = item.getProduct();
+            if (product.isPromotionActive()) {
+                double newPrice = CartItem.calculatePrice(product, item.getQuantity());
+                item.setTotalPrice(newPrice);
+            }
+        }
+        displayShoppingCart(); // Visa den uppdaterade varukorgen
+    }
+
 
     public static void displayCartTotalPrice() {
         double total = 0;

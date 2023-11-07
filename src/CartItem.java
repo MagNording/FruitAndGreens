@@ -23,9 +23,11 @@ public class CartItem {
         this.quantity = quantity;
     }
     public void setTotalPrice(double totalPrice) {
-        this.totalPrice = totalPrice;
+        this.totalPrice = roundToNearestHalf(totalPrice);
     }
-
+    public static double roundToNearestHalf(double value) {
+        return Math.round(value * 2) / 2.0;
+    }
     static double calculatePrice(Product product, double quantity) {
         double price = product.isPromotionActive() && product.getPromotionPrice() > 0 ?
                 product.getPromotionPrice() :
@@ -35,10 +37,17 @@ public class CartItem {
 
     @Override
     public String toString() {
+        // Bestämmer enheten baserat på om priset är per vikt eller styck.
+        String unit = product.isWeightPrice() ? "kg" : "st";
+
+        // Lägger till kampanjinformation om en kampanj är aktiv.
         String promotionInfo = product.isPromotionActive() ?
-                String.format("(Kampanj! Enhet: %.2f kr)", product.getPromotionPrice()) : "";
-        return String.format("Produkt: %-10s Kvantitet: %-5.2f Enhetpris: %.2f kr Totalpris: %.2f kr %s",
-                product.getName(), quantity, product.getPrice(), totalPrice, promotionInfo);
+                String.format("(Kampanjpris: %.2f kr)", product.getPromotionPrice()) : "";
+
+        // Formaterar strängen för att inkludera all relevant information.
+        return String.format("Produkt: %-10s Kvantitet: %5.2f %s Enhetpris: %.2f kr Summa: %.2f kr %s",
+                product.getName(), quantity, unit, product.getPrice(), totalPrice, promotionInfo);
     }
+
 
 }
