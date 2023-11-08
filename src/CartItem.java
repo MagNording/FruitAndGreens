@@ -29,24 +29,42 @@ public class CartItem {
         return Math.round(value * 2) / 2.0;
     }
     static double calculatePrice(Product product, double quantity) {
-        double price = product.isPromotionActive() && product.getPromotionPrice() > 0 ?
-                product.getPromotionPrice() :
-                product.getPrice();
-        return product.isWeightPrice() ? price * quantity : price * (int)quantity;
+        double price = product.getPrice();
+
+        // Kontrollera om det är en "Köp två betala för en"-kampanj och att kampanjvillkoren inte är null
+        if (product.isPromotionActive() && product.getPromotionTerms() != null &&
+                product.getPromotionTerms().equalsIgnoreCase("Köp två betala för en")) {
+            int itemsToChargeFor = (int)quantity / 2 + (int)quantity % 2;
+            price = price * itemsToChargeFor;
+        } else if (product.isWeightPrice() && quantity > 2) {
+            // Beräkna priset för "över 2 kg - 20% rabatt"-kampanjen
+            price = price * quantity * 0.8; // Ger 20% rabatt
+        } else {
+            // Inga kampanjer, beräkna standardpriset
+            price = price * quantity;
+        }
+
+        return price;
     }
+
     @Override
     public String toString() {
-        // Bestämmer enheten baserat på om priset är per vikt eller styck.
         String unit = product.isWeightPrice() ? "kg" : "st";
+        String priceInfo = String.format("Enhetpris: %.2f kr", product.getPrice());
+        String promotionInfo = "";
 
-        // Lägger till kampanjinformation om en kampanj är aktiv.
-        String promotionInfo = product.isPromotionActive() ?
-                String.format("(Kampanjpris: %.2f kr)", product.getPromotionPrice()) : "";
+        if (product.isPromotionActive()) {
+            promotionInfo = String.format(" (Kampanj! %s - Kampanjpris: %.2f kr %s)",
+                    product.getPromotionTerms(),
+                    product.getPromotionPrice(), unit);
+            // Här antar vi att totalPrice har justerats för att reflektera kampanjpriset,
+            // så vi behöver inte justera det här igen
+        }
 
-        // Formaterar strängen för att inkludera all relevant information.
-        return String.format("Produkt: %-10s Kvantitet: %5.2f %s Enhetpris: %.2f kr Summa: %.2f kr %s",
-                product.getName(), quantity, unit, product.getPrice(), totalPrice, promotionInfo);
+        return String.format("Produkt: %-10s Kvantitet: %5.2f %s %s Summa: %.2f kr%s",
+                product.getName(), quantity, unit, priceInfo, totalPrice, promotionInfo);
     }
+
 
 
 }

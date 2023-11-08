@@ -10,25 +10,17 @@ public class Product {
     private String promotionTerms;
     private boolean isPromotionActive; // promotion status
 
-
+    // Eventuellt ta bort, man skapar en produkt, sedan lägger man en kampanj på varan om så behövs?
     public Product(String name, double price, String[] productGroup, boolean isWeightPrice,
-                   double promotionPrice, String promotionTerms) {
+                   Double promotionPrice, String promotionTerms) {
         this.name = name;
         this.price = price;
         this.productGroup = productGroup;
         this.isWeightPrice = isWeightPrice;
-        this.promotionPrice = promotionPrice;
-        this.promotionTerms = promotionTerms;
+        this.promotionPrice = promotionPrice != null ? promotionPrice : 0.0;
+        this.promotionTerms = promotionTerms != null ? promotionTerms : "Ingen kampanj";
+        this.isPromotionActive = promotionPrice != null && promotionPrice > 0;
     }
-
-    public Product(String name, double price, String[] productGroup, boolean isWeightPrice) {
-        this.name = name;
-        this.price = price;
-        this.productGroup = productGroup;
-        this.isWeightPrice = isWeightPrice;
-    }
-
-    // villkora om det är isPromotional?
     @Override
     public String toString() {
         String priceType = isWeightPrice ? "Pris/kg" : "Pris/st";
