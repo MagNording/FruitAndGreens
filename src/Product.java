@@ -7,36 +7,46 @@ public class Product {
     private String[] productGroup;
     private boolean isWeightPrice;
     private double promotionPrice;
-    private String promotionTerms;
-    private boolean isPromotionActive; // promotion status
+    private boolean isBuyTwoGetOne; // Indikerar specifikt "Köp två betala för en" kampanjen
+    private boolean isPromotionActive; // Indikerar om någon kampanj är aktiv
 
-    // Eventuellt ta bort, man skapar en produkt, sedan lägger man en kampanj på varan om så behövs?
-    public Product(String name, double price, String[] productGroup, boolean isWeightPrice,
-                   Double promotionPrice, String promotionTerms) {
+    // Konstruktor för produkter utan kampanj
+    public Product(String name, double price, String[] productGroup, boolean isWeightPrice) {
         this.name = name;
         this.price = price;
         this.productGroup = productGroup;
         this.isWeightPrice = isWeightPrice;
-        this.promotionPrice = promotionPrice != null ? promotionPrice : 0.0;
-        this.promotionTerms = promotionTerms != null ? promotionTerms : "Ingen kampanj";
-        this.isPromotionActive = promotionPrice != null && promotionPrice > 0;
+        // Standardvärden för kampanjattribut
+        this.promotionPrice = 0.0;
+        this.isBuyTwoGetOne = false;
+        this.isPromotionActive = false;
     }
+
+    // Överbelastad konstruktor för produkter med kampanj
+    public Product(String name, double price, String[] productGroup, boolean isWeightPrice,
+                   double promotionPrice, boolean isBuyTwoGetOne) {
+        this(name, price, productGroup, isWeightPrice); // Anropa den ursprungliga konstruktorn
+        // Sätt kampanjattributen
+        this.promotionPrice = promotionPrice;
+        this.isBuyTwoGetOne = isBuyTwoGetOne;
+        this.isPromotionActive = promotionPrice > 0 || isBuyTwoGetOne;
+    }
+
     @Override
     public String toString() {
         String priceType = isWeightPrice ? "Pris/kg" : "Pris/st";
+        String productGroupStr = (productGroup != null && productGroup.length > 0) ?
+                String.join(", ", productGroup) : "Ingen kategori";
 
-        String productGroupStr = "";
-        if (productGroup != null && productGroup.length > 0) {
-            productGroupStr = String.join(", ", productGroup);
-        }
+        // Bygg upp strängen för kampanjinformation baserat på vilken kampanj som är aktiv.
         String promotionInfo = "";
-        if (promotionPrice > 0) {
-            promotionInfo = String.format(" Kampanjpris: %.2f", promotionPrice);
-            if (promotionTerms != null && !promotionTerms.isEmpty()) {
-                promotionInfo += String.format(" Kampanjvillkor: %s", promotionTerms);
-            }
+        if (isBuyTwoGetOne) {
+            promotionInfo = " Kampanj: Köp två betala för en";
+        } else if (isPromotionActive && promotionPrice > 0) {
+            promotionInfo = String.format(" Kampanjpris: %.2f kr", promotionPrice);
         }
-        return String.format("Produkt: %-10s %s: %.2f Varugrupp: %-20s%s",
+
+        return String.format("Produkt: %-10s %s: %.2f kr Varugrupp: %-20s%s",
                 name, priceType, price, productGroupStr, promotionInfo);
     }
 
@@ -89,18 +99,18 @@ public class Product {
         this.promotionPrice = promotionPrice;
     }
 
-    public String getPromotionTerms() {
-        return promotionTerms;
-    }
-    public void setPromotionTerms(String promotionTerms) {
-        this.promotionTerms = promotionTerms;
-    }
-
     public boolean isWeightPrice() {
         return isWeightPrice;
     }
     public void setWeightPrice(boolean weightPrice) {
         isWeightPrice = weightPrice;
+    }
+    public boolean isBuyTwoGetOne() {
+        return isBuyTwoGetOne;
+    }
+    public void setBuyTwoGetOne(boolean buyTwoGetOne) {
+        isBuyTwoGetOne = buyTwoGetOne;
+        isPromotionActive = buyTwoGetOne || (promotionPrice > 0);
     }
 
 }

@@ -30,21 +30,28 @@ public class CartItem {
     }
     static double calculatePrice(Product product, double quantity) {
         double price = product.getPrice();
+        double totalPrice = 0.0;
 
-        // Kontrollera om det är en "Köp två betala för en"-kampanj och att kampanjvillkoren inte är null
-        if (product.isPromotionActive() && product.getPromotionTerms() != null &&
-                product.getPromotionTerms().equalsIgnoreCase("Köp två betala för en")) {
-            int itemsToChargeFor = (int)quantity / 2 + (int)quantity % 2;
-            price = price * itemsToChargeFor;
-        } else if (product.isWeightPrice() && quantity > 2) {
-            // Beräkna priset för "över 2 kg - 20% rabatt"-kampanjen
-            price = price * quantity * 0.8; // Ger 20% rabatt
+        if (product.isPromotionActive()) {
+            if (product.getPromotionPrice() > 0) {
+                price = product.getPromotionPrice();  // Använd kampanjpriset
+            }
+
+            if (product.isBuyTwoGetOne()) {
+                // Betala fullt pris för varje par av produkten och lägg till en extra utan kostnad om det är en udda kvantitet
+                int pairs = (int) quantity / 2;
+                totalPrice = (pairs * 2 + (quantity % 2)) * price;
+            } else if (product.isWeightPrice() && quantity > 2) {
+                // För viktpriser över 2 kg, applicera en 20% rabatt
+                totalPrice = price * quantity * 0.8;
+            } else {
+                totalPrice = price * quantity; // Standardpris
+            }
         } else {
-            // Inga kampanjer, beräkna standardpriset
-            price = price * quantity;
+            totalPrice = price * quantity; // Inga kampanjer, beräkna standardpriset
         }
 
-        return price;
+        return totalPrice;
     }
 
     @Override
@@ -54,16 +61,20 @@ public class CartItem {
         String promotionInfo = "";
 
         if (product.isPromotionActive()) {
-            promotionInfo = String.format(" (Kampanj! %s - Kampanjpris: %.2f kr %s)",
-                    product.getPromotionTerms(),
-                    product.getPromotionPrice(), unit);
-            // Här antar vi att totalPrice har justerats för att reflektera kampanjpriset,
-            // så vi behöver inte justera det här igen
+            if (product.getPromotionPrice() > 0) {
+                promotionInfo = String.format(" (Kampanjpris: %.2f kr %s)", product.getPromotionPrice(), unit);
+            } else if (product.isBuyTwoGetOne()) {
+                promotionInfo = " (Köp två betala för en)";
+            }
+            // Anta att totalPrice har justerats för att reflektera kampanjen
         }
 
         return String.format("Produkt: %-10s Kvantitet: %5.2f %s %s Summa: %.2f kr%s",
                 product.getName(), quantity, unit, priceInfo, totalPrice, promotionInfo);
     }
+
+
+
 
 
 
