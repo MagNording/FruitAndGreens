@@ -30,25 +30,24 @@ public class CartItem {
     }
     static double calculatePrice(Product product, double quantity) {
         double price = product.getPrice();
-        double totalPrice = 0.0;
+        double totalPrice;
 
         if (product.isPromotionActive()) {
-            if (product.getPromotionPrice() > 0) {
-                price = product.getPromotionPrice();  // Använd kampanjpriset
-            }
-
             if (product.isBuyTwoGetOne()) {
-                // Betala fullt pris för varje par av produkten och lägg till en extra utan kostnad om det är en udda kvantitet
+                // For every two items, the customer pays for one, if there's at least one pair.
                 int pairs = (int) quantity / 2;
-                totalPrice = (pairs * 2 + (quantity % 2)) * price;
-            } else if (product.isWeightPrice() && quantity > 2) {
-                // För viktpriser över 2 kg, applicera en 20% rabatt
-                totalPrice = price * quantity * 0.8;
+                double oddItem = quantity % 2;
+                totalPrice = (pairs * price) + (oddItem * price); // Pay for one in each pair, plus any odd item.
+            } else if (product.getPromotionPrice() > 0) {
+                // Use the promotion price if it is greater than 0
+                totalPrice = product.getPromotionPrice() * quantity;
             } else {
-                totalPrice = price * quantity; // Standardpris
+                // Other promotions can be calculated here
+                totalPrice = price * quantity;
             }
         } else {
-            totalPrice = price * quantity; // Inga kampanjer, beräkna standardpriset
+            // No promotions, calculate the standard price
+            totalPrice = price * quantity;
         }
 
         return totalPrice;

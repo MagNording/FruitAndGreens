@@ -185,12 +185,14 @@ public class Main {
                 CartItem existingItem = findCartItemByProduct(selectedProduct);
                 if (existingItem != null) {
                     existingItem.setQuantity(existingItem.getQuantity() + quantity);
-                    double additionalPrice = CartItem.calculatePrice(selectedProduct, quantity);
-                    existingItem.setTotalPrice(existingItem.getTotalPrice() + additionalPrice);
+                    // Efter att kvantiteten uppdaterats, uppdatera priset för denna specifika CartItem.
+                    updateCartForPromotions(existingItem);
                     System.out.println("Kvantiteten för " + selectedProduct.getName() + " har uppdaterats i varukorgen.");
                 } else {
                     CartItem newItem = new CartItem(selectedProduct, quantity);
                     shoppingCart.add(newItem);
+                    // Uppdatera priset för det nyligen tillagda CartItem.
+                    updateCartForPromotions(newItem);
                     System.out.println(UserInput.capitalize(selectedProduct.getName()) + " har lagts till i varukorgen.");
                 }
                 displayCartSummary(); // Visa totalpriset för varukorgen
@@ -213,7 +215,14 @@ public class Main {
             System.out.println("Varukorgen är tom.");
         }
     }
-
+    public static CartItem findCartItemByProduct(Product product) {
+        for (CartItem item : shoppingCart) {
+            if (item.getProduct().equals(product)) {
+                return item;
+            }
+        }
+        return null;
+    }
     public static void displayCartSummary() {
         double totalPrice = 0;
         for (CartItem item : shoppingCart) {
@@ -221,6 +230,25 @@ public class Main {
         }
         totalPrice = CartItem.roundToNearestHalf(totalPrice);
         System.out.printf("Totalpris: %.2f kr\n", totalPrice);
+    }
+    public static void updateCartForPromotions() {
+        for (CartItem item : shoppingCart) {
+            Product product = item.getProduct();
+            if (product.isPromotionActive()) {
+                // Uppdatera priset baserat på om produkten har en aktuell kampanj
+                double newPrice = CartItem.calculatePrice(product, item.getQuantity());
+                item.setTotalPrice(newPrice);
+                // Notera: Vi justerar inte kvantiteten här eftersom det totala priset redan reflekterar kampanjen.
+            }
+        }
+    }
+    public static void updateCartForPromotions(CartItem item) {
+        Product product = item.getProduct();
+        if (product.isPromotionActive()) {
+            double newPrice = CartItem.calculatePrice(product, item.getQuantity());
+            item.setTotalPrice(newPrice);
+            // Notera: Vi uppdaterar inte kvantiteten här eftersom det totala priset redan reflekterar kampanjen.
+        }
     }
 
     // 5. Lägg till en produkt
@@ -305,6 +333,7 @@ public class Main {
             default -> System.out.println("Ogiltigt val. Vänligen ange ett nummer mellan 1 och 3.");
         }
     }
+
     public static Product getProductByName(String name) {
         for (Product product : allProducts) {
             if (product.getName().equalsIgnoreCase(name)) {
@@ -410,15 +439,6 @@ public class Main {
         updateCartForPromotions(); // Uppdaterar varukorgen med det nya kampanjpriset
     }
 
-    public static CartItem findCartItemByProduct(Product product) {
-        for (CartItem item : shoppingCart) {
-            if (item.getProduct().equals(product)) {
-                return item;
-            }
-        }
-        return null;
-    }
-
     public static String getProductName() {
         String nameInput;
         while (true) {
@@ -454,22 +474,7 @@ public class Main {
         return (categoryInput).split(",");
     }
 
-    public static void updateCartForPromotions() {
-        for (CartItem item : shoppingCart) {
-            Product product = item.getProduct();
-            if (product.isPromotionActive()) {
-                // Uppdatera priset baserat på om produkten har en aktuell kampanj
-                double newPrice = CartItem.calculatePrice(product, item.getQuantity());
-                item.setTotalPrice(newPrice);
-                // Om "Köp två betala för en" är aktiv, justera kvantiteten som ska betalas för
-                if (product.isBuyTwoGetOne()) {
-                    int pairs = (int)item.getQuantity() / 2;
-                    double freeItems = item.getQuantity() % 2;
-                    item.setQuantity(pairs * 2 + freeItems); // Justera kvantiteten till vad kunden ska få
-                }
-            }
-        }
-    }
+
 
 
 }
