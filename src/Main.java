@@ -262,7 +262,17 @@ public class Main {
             switch(menuChoice){
                 case 1 -> removeItem(shoppingCart);
                 case 2 -> emptyCart();
-                case 3 -> displayShoppingCart();
+                case 3 -> {
+                    if (!shoppingCart.isEmpty()) {
+                        for (CartItem item : shoppingCart) {
+                            System.out.println(item);
+                        }
+                        System.out.println(new String(new char[75]).replace("\0", "-"));
+                        displayCartSummary();
+                    } else {
+                        System.out.println("Varukorgen är tom.");
+                    }
+                }
                 case 4 -> {return;}
                 default -> System.out.println("Ogiltigt val, försök igen.");
             }
@@ -512,27 +522,45 @@ public class Main {
             default -> System.out.println("Ogiltigt val. Ange antingen 1. eller 2.");
         }
     }
-
     public static void toggleCampaignStatus(Product product) {
-        System.out.print("Vill du aktivera 'Köp två betala för en'-kampanjen? (j/n): ");
-        boolean activateCampaign = UserInput.readString().equalsIgnoreCase("j");
-        product.setBuyTwoGetOne(activateCampaign);
-
-        String status = activateCampaign ? "aktiverad" : "deaktiverad";
-        System.out.println("'Köp två betala för en'-kampanjen har blivit " + status + ".");
-        updateCartForPromotions(); // Uppdaterar varukorgen
+        // Om kampanjen redan är aktiv, ge alternativet att deaktivera den
+        if (product.isBuyTwoGetOne()) {
+            System.out.print("Produkten har redan 'Köp två betala för en'-kampanjen aktiv. Vill du deaktivera den? (j/n): ");
+            boolean deactivate = UserInput.readString().equalsIgnoreCase("j");
+            if (deactivate) {
+                product.setBuyTwoGetOne(false);
+                System.out.println("'Köp två betala för en'-kampanjen har blivit deaktiverad.");
+            } else {
+                System.out.println("'Köp två betala för en'-kampanjen är fortfarande aktiv.");
+            }
+        } else {
+            // Om kampanjen inte är aktiv, ge alternativet att aktivera den
+            System.out.print("Produkten har ingen aktiv 'Köp två betala för en'-kampanj. Vill du aktivera den? (j/n): ");
+            boolean activate = UserInput.readString().equalsIgnoreCase("j");
+            if (activate) {
+                product.setBuyTwoGetOne(true);
+                System.out.println("'Köp två betala för en'-kampanjen har blivit aktiverad.");
+            } else {
+                System.out.println("Ingen kampanj har aktiverats.");
+            }
+        }
+        // Uppdaterar varukorgen oavsett om vi aktiverar eller deaktiverar kampanjen
+        updateCartForPromotions();
     }
 
     public static void updateCampaignPrice(Product product) {
-        if (!product.isPromotionActive()) {
-            System.out.println("Aktivera kampanjen först.");
-            return;
+        // Kontrollera om det finns en "Köp två betala för en"-kampanj aktiv
+        if (product.isBuyTwoGetOne()) {
+            System.out.println("Produkten har en 'Köp två betala för en'-kampanj aktiv. Kampanjpriset kan inte uppdateras.");
+        } else {
+            // Här kan du lägga till logik för att uppdatera kampanjpriset
+            System.out.print("Ange det nya kampanjpriset: ");
+            double newPromotionPrice = UserInput.readDouble();
+            product.setPromotionPrice(newPromotionPrice);
+            System.out.println("Kampanjpriset har uppdaterats.");
         }
-        System.out.print("Ange det nya kampanjpriset: ");
-        double newPromotionPrice = UserInput.readDouble();
-        product.setPromotionPrice(newPromotionPrice);
-        System.out.println("Kampanjpriset har uppdaterats.");
-        updateCartForPromotions(); // Uppdaterar varukorgen med det nya kampanjpriset
+        // Uppdaterar varukorgen med det nya kampanjpriset
+        updateCartForPromotions();
     }
 
     public static String getProductName() {
