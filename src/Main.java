@@ -102,15 +102,14 @@ public class Main {
         int searchType;
         do {
             System.out.println("Vill du söka på:");
-            System.out.println("1. Produktnamn");
-            System.out.println("2. Varugrupp");
+            System.out.print("1. Produktnamn\n2. Varugrupp\n> ");
             searchType = UserInput.readInt();
             if (searchType != 1 && searchType != 2) {
-                System.out.println("Ogiltigt val, vänligen ange 1 eller 2.");
+                System.out.print("Ogiltigt val, vänligen ange 1 eller 2: ");
             }
         } while (searchType != 1 && searchType != 2);
 
-        System.out.println("Ange sökterm: ");
+        System.out.print("Ange sökterm: ");
         String searchTerm = UserInput.readString().toLowerCase();
         boolean productFound = false;
         switch (searchType) {
@@ -118,7 +117,6 @@ public class Main {
             case 1 -> productFound = searchByProductName(searchTerm);
             // Sökning på varugrupp
             case 2 -> productFound = searchByProductGroup(searchTerm);
-            // Ingen default-fall behövs då vi redan kontrollerat inmatningen
         }
         if (!productFound) {
             System.out.println("Ingen produkt hittades med angiven sökterm.");
@@ -136,15 +134,19 @@ public class Main {
         return productFound;
     }
     public static boolean searchByProductGroup(String searchTerm) {
-        boolean productFound = false; // Flagga för att hålla reda på om någon produkt har hittats
-
+        boolean productFound = false;
+        Set<String> displayedProductNames = new HashSet<>(); // Set för att hålla reda på visade produktnamn
         for (Product product : allProducts) {
             String[] productGroup = product.getProductGroup();
             if (productGroup != null) {
                 for (String group : productGroup) {
                     if (group.toLowerCase().contains(searchTerm)) {
-                        System.out.println(product);
-                        productFound = true; // Sätter flaggan till true om en produkt hittas
+                        // Kontrollera om produktnamnet redan har visats
+                        if (!displayedProductNames.contains(product.getName())) {
+                            System.out.println(product);
+                            productFound = true;
+                            displayedProductNames.add(product.getName()); // Lägg till produktnamnet i setet
+                        }
                     }
                 }
             }
@@ -168,7 +170,7 @@ public class Main {
             System.out.printf("%d. %-15s %s%s\n", (i + 1), product.getName(), priceInfo, promotionInfo);
         }
         // Låt användaren välja en produkt
-        System.out.println("Välj numret för den produkt du vill lägga till i varukorgen:");
+        System.out.print("\nVälj numret för den produkt du vill lägga till i varukorgen: ");
         int productIndex = UserInput.readInt() - 1;
 
         if (productIndex >= 0 && productIndex < allProducts.size()) {
@@ -551,7 +553,7 @@ public class Main {
         allProducts.add(new Product("Kiwi", 5, new String[]{"FRUKT", "CITRUSVÄXT"}, false,
                 3.50, false));
 
-        allProducts.add(new Product("Morot", 16.48, new String[]{"GRÖNSAK", "GRÖNSAK"}, true));
+        allProducts.add(new Product("Morot", 16.48, new String[]{"GRÖNSAK", "ROTFRUKT"}, true));
         allProducts.add(new Product("Broccoli", 18.83, new String[]{"GRÖNSAK", "KÅL"}, true));
     }
 

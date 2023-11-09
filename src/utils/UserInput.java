@@ -11,7 +11,7 @@ public class UserInput {
         do {
             stringValue = input.nextLine().trim();
             if (stringValue.isBlank()) {
-                System.out.println("Felaktig inmatning, fältet får inte vara tomt.");
+                System.out.print("Ingen inmatning gjord, försök igen.\n > ");
             }
         } while (stringValue.isBlank());
         return stringValue;
@@ -26,20 +26,18 @@ public class UserInput {
     }
 
     public static int readInt() {
-        int intValue;
+        int intValue = 0;
         while (true) {
             try {
-                if (input.hasNextInt()) {
-                    intValue = input.nextInt();
-                    input.nextLine(); // Rensa bufferten
-                    break;
+                String inputLine = input.nextLine();
+                if (inputLine.isEmpty()) {
+                    System.out.println("Ingen inmatning gjord, försök igen.");
                 } else {
-                    System.out.println("Felaktig inmatning, försök igen.");
-                    input.nextLine();
+                    intValue = Integer.parseInt(inputLine);
+                    break;
                 }
-            } catch (InputMismatchException e) {
+            } catch (NumberFormatException e) {
                 System.out.println("Felaktig inmatning, försök igen.");
-                input.nextLine();
             }
         }
         return intValue;
