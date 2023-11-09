@@ -167,7 +167,7 @@ public class Main {
             } else if (product.isPromotionActive() && product.getPromotionPrice() > 0) {
                 promotionInfo = String.format(" - Kampanjpris: %.2f kr", product.getPromotionPrice());
             }
-            System.out.printf("%d. %-15s %s%s\n", (i + 1), product.getName(), priceInfo, promotionInfo);
+            System.out.printf("%d. %-10s %s%s\n", (i + 1), product.getName(), priceInfo, promotionInfo);
         }
         // Låt användaren välja en produkt
         System.out.print("\nVälj numret för den produkt du vill lägga till i varukorgen: ");
@@ -197,7 +197,7 @@ public class Main {
                     updateCartForPromotions(newItem);
                     System.out.println(UserInput.capitalize(selectedProduct.getName()) + " har lagts till i varukorgen.");
                 }
-                displayCartSummary(); // Visa totalpriset
+                displayCartSummary();
             }
         } else {
             System.out.println("Ogiltigt val, försök igen.");
