@@ -34,19 +34,19 @@ public class CartItem {
 
         if (product.isPromotionActive()) {
             if (product.isBuyTwoGetOne()) {
-                // For every two items, the customer pays for one, if there's at least one pair.
+                // För varje par, betala för en, om minst ett par
                 int pairs = (int) quantity / 2;
                 double oddItem = quantity % 2;
-                totalPrice = (pairs * price) + (oddItem * price); // Pay for one in each pair, plus any odd item.
+                totalPrice = (pairs * price) + (oddItem * price); // Betala för en i varje par plus en udda
             } else if (product.getPromotionPrice() > 0) {
-                // Use the promotion price if it is greater than 0
+                // Använd kampanjpris om överstiger 0
                 totalPrice = product.getPromotionPrice() * quantity;
             } else {
-                // Other promotions can be calculated here
+                // Andra kampanjer kan komma att läggas till här
                 totalPrice = price * quantity;
             }
         } else {
-            // No promotions, calculate the standard price
+            // ingen kampanj, standard priset
             totalPrice = price * quantity;
         }
 
