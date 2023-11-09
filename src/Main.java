@@ -266,16 +266,21 @@ public class Main {
         double priceInput = getProductPrice();
         String[] categoryArray = getProductCategories();
 
-        // Fråga användaren om produkten ska ha en kampanj
-        System.out.print("Ska produkten ha en 'Köp två betala för en'-kampanj? (j/n): ");
-        boolean isBuyTwoGetOne = UserInput.readString().trim().equalsIgnoreCase("j");
+        boolean isBuyTwoGetOne = false;
+        if (!isWeightPrice) {
+            System.out.print("Ska produkten ha en 'Köp två betala för en'-kampanj? (j/n): ");
+            isBuyTwoGetOne = UserInput.readString().trim().equalsIgnoreCase("j");
+        }
         double promotionPrice = 0.0;  // Sätt ett standardvärde för promotionPrice
 
         // Skapa och lägg till den nya produkten i listan
         Product product = new Product(nameInput, priceInput, categoryArray, isWeightPrice, promotionPrice, isBuyTwoGetOne);
         allProducts.add(product);
-        System.out.println("Produkten " + product.getName() + " har lagts till med " +
-                (isBuyTwoGetOne ? "'Köp två betala för en'-kampanj." : "ingen kampanj."));
+        String confirmationMessage = "Produkten " + nameInput + " har lagts till";
+        if (!isWeightPrice && isBuyTwoGetOne) {
+            confirmationMessage += " med 'Köp två betala för en'-kampanj.";
+        }
+        System.out.println(confirmationMessage + ".");
     }
 
     // 6. Ta bort en produkt
@@ -310,27 +315,35 @@ public class Main {
     // 7. Uppdatera Produkt
     public static void updateProduct() {
         System.out.print("Ange namnet på produkten du vill uppdatera: ");
-        String searchTerm = UserInput.readString().toLowerCase();
-
-        if (!searchByProductName(searchTerm)) {
-            System.out.println("Produkten hittades inte.");
-            return; // Avsluta om produkten inte hittas
-        }
-        System.out.print("Välj en produkt från listan att uppdatera: ");
         String productName = UserInput.readString();
         Product productToUpdate = getProductByName(productName);
 
         if (productToUpdate == null) {
             System.out.println("Produkten hittades inte.");
-            return;
+            return; // Avslutar metoden tidigt om produkten inte finns
         }
-        System.out.print("1. Uppdatera namn\n2. Uppdatera pris\n3. Hantera kampanj\n> ");
+        // Visa produktinformation till användaren
+        System.out.println(productToUpdate);
+
+        // Menyn för vad användaren kan uppdatera
+        System.out.print("Vad vill du uppdatera?\n1. Namn\n2. Pris\n");
+        if (!productToUpdate.isWeightPrice()) {
+            System.out.print("3. Hantera kampanj\n");
+        }
+        System.out.print("> ");
         int updateChoice = UserInput.readInt();
+
         switch (updateChoice) {
             case 1 -> updateProductName(productToUpdate);
             case 2 -> updateProductPrice(productToUpdate);
-            case 3 -> manageCampaign(productToUpdate);
-            default -> System.out.println("Ogiltigt val. Vänligen ange ett nummer mellan 1 och 3.");
+            case 3 -> {
+                if (!productToUpdate.isWeightPrice()) {
+                    manageCampaign(productToUpdate);
+                } else {
+                    System.out.println("Kampanjer kan inte appliceras på produkter som säljs per vikt.");
+                }
+            }
+            default -> System.out.println("Ogiltigt val. Försök igen.");
         }
     }
 
