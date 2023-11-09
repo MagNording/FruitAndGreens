@@ -1,4 +1,4 @@
-// magnus.nording@iths.se
+// magnus nording, magnus.nording@iths.se
 import java.util.Objects;
 
 public class Product {
@@ -45,9 +45,11 @@ public class Product {
         } else if (isPromotionActive && promotionPrice > 0) {
             promotionInfo = String.format(" Kampanjpris: %.2f kr", promotionPrice);
         }
+        String formattedPrice = String.format("%.2f kr", price);
+        return String.format("Produkt: %-10s %s: %-10s Varugrupp: %-20s %s",
+                name, priceType, formattedPrice, productGroupStr, promotionInfo);
 
-        return String.format("Produkt: %-10s %s: %.2f kr Varugrupp: %-20s%s",
-                name, priceType, price, productGroupStr, promotionInfo);
+
     }
 
     @Override

@@ -1,5 +1,5 @@
-package utils;// magnus.nording@iths.se
-
+package utils;
+// magnus nording, magnus.nording@iths.se
 import java.util.InputMismatchException;
 import java.util.Scanner;
 

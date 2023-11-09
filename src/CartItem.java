@@ -1,3 +1,4 @@
+// magnus nording, magnus.nording@iths.se
 public class CartItem {
     private Product product;
     private double quantity;

@@ -1,4 +1,4 @@
-// Magnus Nording, magnus.nording@iths.se
+// magnus nording, magnus.nording@iths.se
 import utils.UserInput;
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -16,12 +16,7 @@ public class Main {
         System.out.println("------------------------------");
         System.out.println("Programmet startas.\n");
 
-        allProducts.add(new Product("Nektarin", 10, new String[]{"STENFRUKT", "FRUKT"}, false,
-                0.0, true));
-
-        allProducts.add(new Product("Morot", 16.48, new String[]{"ROTFRUKT", "GRÖNSAK"}, true));
-        allProducts.add(new Product("Broccoli", 18.83, new String[]{"KÅL", "GRÖNSAK"}, true));
-
+        theProducts();
 
         do {
             System.out.println(isAdmin ? "Användare: ADMIN" : "Användare: KUND");
@@ -162,10 +157,15 @@ public class Main {
         // Visa en numrerad lista över produkter med priser
         for (int i = 0; i < allProducts.size(); i++) {
             Product product = allProducts.get(i);
-            String priceInfo = product.isWeightPrice() ?
-                    String.format("(%.2f kr/kg)", product.getPrice()) :
-                    String.format("(%.2f kr/st)", product.getPrice());
-            System.out.println((i + 1) + ". " + product.getName() + " " + priceInfo);
+            String priceFormat = product.isWeightPrice() ? "(%.2f kr/kg)" : "(%.2f kr/st)";
+            String priceInfo = String.format(priceFormat, product.getPrice());
+            String promotionInfo = "";
+            if (product.isBuyTwoGetOne()) {
+                promotionInfo = " - Kampanj: Köp två betala för en";
+            } else if (product.isPromotionActive() && product.getPromotionPrice() > 0) {
+                promotionInfo = String.format(" - Kampanjpris: %.2f kr", product.getPromotionPrice());
+            }
+            System.out.printf("%d. %-15s %s%s\n", (i + 1), product.getName(), priceInfo, promotionInfo);
         }
         // Låt användaren välja en produkt
         System.out.println("Välj numret för den produkt du vill lägga till i varukorgen:");
@@ -185,17 +185,17 @@ public class Main {
                 CartItem existingItem = findCartItemByProduct(selectedProduct);
                 if (existingItem != null) {
                     existingItem.setQuantity(existingItem.getQuantity() + quantity);
-                    // Efter att kvantiteten uppdaterats, uppdatera priset för denna specifika CartItem.
+
                     updateCartForPromotions(existingItem);
                     System.out.println("Kvantiteten för " + selectedProduct.getName() + " har uppdaterats i varukorgen.");
                 } else {
                     CartItem newItem = new CartItem(selectedProduct, quantity);
                     shoppingCart.add(newItem);
-                    // Uppdatera priset för det nyligen tillagda CartItem.
+
                     updateCartForPromotions(newItem);
                     System.out.println(UserInput.capitalize(selectedProduct.getName()) + " har lagts till i varukorgen.");
                 }
-                displayCartSummary(); // Visa totalpriset för varukorgen
+                displayCartSummary(); // Visa totalpriset
             }
         } else {
             System.out.println("Ogiltigt val, försök igen.");
@@ -541,7 +541,18 @@ public class Main {
         return (categoryInput).split(",");
     }
 
+    public static void theProducts() {
+        allProducts.add(new Product("Nektarin", 10, new String[]{"FRUKT", "STENFRUKT"}, false,
+                0.0, true));
 
+        allProducts.add(new Product("Apelsin", 5, new String[]{"FRUKT", "CITRUSVÄXT"}, false,
+                0.0, true));
 
+        allProducts.add(new Product("Kiwi", 5, new String[]{"FRUKT", "CITRUSVÄXT"}, false,
+                3.50, false));
+
+        allProducts.add(new Product("Morot", 16.48, new String[]{"GRÖNSAK", "GRÖNSAK"}, true));
+        allProducts.add(new Product("Broccoli", 18.83, new String[]{"GRÖNSAK", "KÅL"}, true));
+    }
 
 }
