@@ -229,7 +229,6 @@ public class Main {
             updateCartForPromotions(newItem);
             System.out.println(UserInput.capitalize(selectedProduct.getName()) + " har lagts till i varukorgen.");
         }
-        displayCartSummary();
     }
 
     // 4. Visa varukorg
@@ -578,7 +577,7 @@ public class Main {
         allProducts.add(new Product("Apelsin", 5, new String[]{"FRUKT", "CITRUSVÄXT"}, false,
                 0.0, true));
 
-        allProducts.add(new Product("Kiwi", 5, new String[]{"FRUKT", "CITRUSVÄXT"}, false,
+        allProducts.add(new Product("Kiwi", 5, new String[]{"FRUKT"}, false,
                 3.50, false));
 
         allProducts.add(new Product("Morot", 16.48, new String[]{"GRÖNSAK", "ROTFRUKT"}, true));
