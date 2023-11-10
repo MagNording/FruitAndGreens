@@ -22,7 +22,7 @@ public class Main {
         theProducts();
 
         do {
-            System.out.println(isAdmin ? GREEN + "Användare: ADMIN" : PURPLE + "Användare: KUND");
+            System.out.println(isAdmin ? GREEN + "Användare: ADMIN" : PURPLE + "KUNDMENY");
             displayMenu();
             System.out.print("Ange ditt menyval: ");
             int menuChoice = UserInput.readInt();
