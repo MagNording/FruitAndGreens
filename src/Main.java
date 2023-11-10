@@ -105,22 +105,24 @@ public class Main {
 
         if (searchType != 1 && searchType != 2) {
             System.out.println("Ogiltigt val, vänligen ange 1 eller 2.");
-            return;
+            return; // Återvänder till menyn om ett ogiltigt val görs.
         }
         System.out.print("Ange sökterm: ");
         String searchTerm = UserInput.readString().toLowerCase();
-        boolean productFound = false;
+        boolean productFound;
 
         if (searchType == 1) {
             productFound = searchByProductName(searchTerm);
             if (!productFound) {
-                System.out.print("Ingen produkt hittades med angivet produktnamn.\n" +
-                        "Vill du söka på varugrupp istället? (j/n): ");
+                System.out.println("Ingen produkt hittades med angivet produktnamn.");
+                System.out.print("Vill du söka efter en varugrupp istället? (j/n): ");
                 if (UserInput.readString().trim().equalsIgnoreCase("j")) {
+                    System.out.print("Ange sökterm för varugrupp: ");
+                    searchTerm = UserInput.readString().toLowerCase();
                     productFound = searchByProductGroup(searchTerm);
                 }
             }
-        } else if (searchType == 2) {
+        } else {
             productFound = searchByProductGroup(searchTerm);
         }
 
@@ -128,7 +130,7 @@ public class Main {
             System.out.println("Ingen produkt hittades med angiven sökterm.");
         }
     }
-
+    // Sök på produktnamn
     public static boolean searchByProductName(String searchTerm) {
         boolean productFound = false;
         for (Product product : allProducts) {
@@ -139,9 +141,10 @@ public class Main {
         }
         return productFound;
     }
+    // Produktgruppssök
     public static boolean searchByProductGroup(String searchTerm) {
         boolean productFound = false;
-        Set<String> displayedProductNames = new HashSet<>(); // Set för att hålla reda på visade produktnamn
+        Set<String> displayedProductNames = new HashSet<>(); // Set för att undvika dubletter
         for (Product product : allProducts) {
             String[] productGroup = product.getProductGroup();
             if (productGroup != null) {
@@ -159,7 +162,6 @@ public class Main {
         }
         return productFound;
     }
-
     // 3. Lägg till i varukorgen
     private static void addToShoppingCart() {
         displayProductsToBuy();
@@ -167,19 +169,18 @@ public class Main {
 
         if (isValidProductIndex(productIndex)) {
             Product selectedProduct = allProducts.get(productIndex);
-            double quantity = requestQuantity(selectedProduct);  // Använd 'selectedProduct' här
-
+            double quantity = requestQuantity(selectedProduct);
             if (confirmAddToCart()) {
-                addOrUpdateCartItem(selectedProduct, quantity);  // Och även här
+                addOrUpdateCartItem(selectedProduct, quantity);
                 displayCartSummary();
             }
         } else {
             System.out.println("Ogiltigt val, försök igen.");
         }
     }
-
+    // Köplistan
     private static void displayProductsToBuy() {
-        // Visa en numrerad lista över produkter med priser
+
         for (int i = 0; i < allProducts.size(); i++) {
             Product product = allProducts.get(i);
             String priceFormat = product.isWeightPrice() ? "(%.2f kr/kg)" : "(%.2f kr/st)";
@@ -219,13 +220,11 @@ public class Main {
         CartItem existingItem = findCartItemByProduct(selectedProduct);
         if (existingItem != null) {
             existingItem.setQuantity(existingItem.getQuantity() + quantity);
-
             updateCartForPromotions(existingItem);
             System.out.println("Kvantiteten för " + selectedProduct.getName() + " har uppdaterats i varukorgen.");
         } else {
             CartItem newItem = new CartItem(selectedProduct, quantity);
             shoppingCart.add(newItem);
-
             updateCartForPromotions(newItem);
             System.out.println(UserInput.capitalize(selectedProduct.getName()) + " har lagts till i varukorgen.");
         }
@@ -245,7 +244,7 @@ public class Main {
             System.out.println("Varukorgen är tom.");
         }
     }
-
+    // Varukorgsmeny
     public static void shoppingCartMenu() {
         int menuChoice;
         do {
@@ -278,7 +277,7 @@ public class Main {
             }
         } while (menuChoice != 4);
     }
-
+    // Ta bort vara
     private static void removeItem(List<CartItem> shoppingCart) {
         if (shoppingCart.isEmpty()) {
             System.out.println("Varukorgen är redan tom.");
@@ -300,7 +299,7 @@ public class Main {
         shoppingCart.remove(itemNumber - 1);
         System.out.println("Varan har tagits bort från varukorgen.");
     }
-
+    // Töm varukorg
     public static void emptyCart() {
         if (shoppingCart.isEmpty()){
             System.out.println("Varukorgen är redan tom.");
@@ -318,6 +317,7 @@ public class Main {
         }
         return null;
     }
+    // Visa totalpris
     public static void displayCartSummary() {
         double totalPrice = 0;
         for (CartItem item : shoppingCart) {
@@ -326,6 +326,7 @@ public class Main {
         totalPrice = CartItem.roundToNearestHalf(totalPrice);
         System.out.printf("Totalpris: %.2f kr\n", totalPrice);
     }
+
     public static void updateCartForPromotions() {
         for (CartItem item : shoppingCart) {
             Product product = item.getProduct();
@@ -336,6 +337,7 @@ public class Main {
             }
         }
     }
+
     public static void updateCartForPromotions(CartItem item) {
         Product product = item.getProduct();
         if (product.isPromotionActive()) {
@@ -343,7 +345,6 @@ public class Main {
             item.setTotalPrice(newPrice);
         }
     }
-
     // 5. Lägg till en produkt
     public static void addNewProduct() {
         String nameInput = getProductName();
@@ -375,7 +376,6 @@ public class Main {
         }
         System.out.println(confirmationMessage + ".");
     }
-
     // 6. Ta bort en produkt
     public static void removeProduct() {
         System.out.println("Ange produkten du vill ta bort: ");
@@ -404,7 +404,6 @@ public class Main {
         }
         System.out.println("Ingen matchande produkt hittades.");
     }
-
     // 7. Uppdatera Produkt
     public static void updateProduct() {
         System.out.print("Ange namnet på produkten du vill uppdatera: ");
@@ -522,6 +521,7 @@ public class Main {
             default -> System.out.println("Ogiltigt val. Ange antingen 1. eller 2.");
         }
     }
+    // Kampanj av eller på
     public static void toggleCampaignStatus(Product product) {
         // Om kampanjen redan är aktiv, ge alternativet att deaktivera den
         if (product.isBuyTwoGetOne()) {
@@ -544,22 +544,22 @@ public class Main {
                 System.out.println("Ingen kampanj har aktiverats.");
             }
         }
-        // Uppdaterar varukorgen oavsett om vi aktiverar eller deaktiverar kampanjen
+        // Uppdaterar varukorg oavsett om aktiverad eller deaktiverad
         updateCartForPromotions();
     }
-
+    // Uppdatera kampanjpris
     public static void updateCampaignPrice(Product product) {
         // Kontrollera om det finns en "Köp två betala för en"-kampanj aktiv
         if (product.isBuyTwoGetOne()) {
             System.out.println("Produkten har en 'Köp två betala för en'-kampanj aktiv. Kampanjpriset kan inte uppdateras.");
         } else {
-            // Här kan du lägga till logik för att uppdatera kampanjpriset
+            // uppdatera kampanjpriset
             System.out.print("Ange det nya kampanjpriset: ");
             double newPromotionPrice = UserInput.readDouble();
             product.setPromotionPrice(newPromotionPrice);
             System.out.println("Kampanjpriset har uppdaterats.");
         }
-        // Uppdaterar varukorgen med det nya kampanjpriset
+        // Uppdaterar varukorgen med det nytt kampanjpris
         updateCartForPromotions();
     }
 
@@ -597,7 +597,7 @@ public class Main {
         String categoryInput = UserInput.readString().toUpperCase();
         return (categoryInput).split(",");
     }
-
+    // Produktlistan
     public static void theProducts() {
         allProducts.add(new Product("Nektarin", 10, new String[]{"FRUKT", "STENFRUKT"}, false,
                 0.0, true));

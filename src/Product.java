@@ -7,10 +7,9 @@ public class Product {
     private String[] productGroup;
     private boolean isWeightPrice;
     private double promotionPrice;
-    private boolean isBuyTwoGetOne; // Indikerar specifikt "Köp två betala för en" kampanjen
-    private boolean isPromotionActive; // Indikerar om någon kampanj är aktiv
+    private boolean isBuyTwoGetOne;
+    private boolean isPromotionActive;
 
-    // Konstruktor för produkter utan kampanj
     public Product(String name, double price, String[] productGroup, boolean isWeightPrice) {
         this.name = name;
         this.price = price;
@@ -22,7 +21,6 @@ public class Product {
         this.isPromotionActive = false;
     }
 
-    // Överbelastad konstruktor för produkter med kampanj
     public Product(String name, double price, String[] productGroup, boolean isWeightPrice,
                    double promotionPrice, boolean isBuyTwoGetOne) {
         this(name, price, productGroup, isWeightPrice); // Anropa den ursprungliga konstruktorn
@@ -38,7 +36,7 @@ public class Product {
         String productGroupStr = (productGroup != null && productGroup.length > 0) ?
                 String.join(", ", productGroup) : "Ingen kategori";
 
-        // Bygg upp strängen för kampanjinformation baserat på vilken kampanj som är aktiv.
+        // Bygg upp strängen för kampanjinformation baserat på vilken kampanj aktiv.
         String promotionInfo = "";
         if (isBuyTwoGetOne) {
             promotionInfo = " Kampanj: Köp två betala för en";
@@ -52,6 +50,7 @@ public class Product {
 
     }
 
+    // Om två `Product` objekt är lika baserat på deras `name`
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -60,15 +59,9 @@ public class Product {
         return Objects.equals(name, product.name);
     }
 
+    // Genererar hashkod för `Product` objekt baserat på `name`
     public int hashCode() {
         return Objects.hashCode(name);
-    }
-
-    public boolean isPromotionActive() {
-        return this.isPromotionActive;
-    }
-    public void setPromotionActive(boolean isPromotionActive) {
-        this.isPromotionActive = isPromotionActive;
     }
 
     public String getName() {
@@ -88,9 +81,7 @@ public class Product {
     public String[] getProductGroup() {
         return productGroup;
     }
-    public void setProductGroup(String[] productGroup) {
-        this.productGroup = productGroup;
-    }
+
     public double getPromotionPrice() {
         return promotionPrice;
     }
@@ -104,9 +95,7 @@ public class Product {
     public boolean isWeightPrice() {
         return isWeightPrice;
     }
-    public void setWeightPrice(boolean weightPrice) {
-        isWeightPrice = weightPrice;
-    }
+
     public boolean isBuyTwoGetOne() {
         return isBuyTwoGetOne;
     }
@@ -114,5 +103,10 @@ public class Product {
         isBuyTwoGetOne = buyTwoGetOne;
         isPromotionActive = buyTwoGetOne || (promotionPrice > 0);
     }
-
+    public boolean isPromotionActive() {
+        return this.isPromotionActive;
+    }
+    public void setPromotionActive(boolean isPromotionActive) {
+        this.isPromotionActive = isPromotionActive;
+    }
 }

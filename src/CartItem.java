@@ -9,7 +9,7 @@ public class CartItem {
         this.quantity = quantity;
         this.totalPrice = calculatePrice(product, quantity);
     }
-
+    // Getters
     public Product getProduct() {
         return product;
     }
@@ -19,16 +19,18 @@ public class CartItem {
     public double getTotalPrice() {
         return totalPrice;
     }
-
+    // Setters
     public void setQuantity(double quantity) {
         this.quantity = quantity;
     }
     public void setTotalPrice(double totalPrice) {
         this.totalPrice = roundToNearestHalf(totalPrice);
     }
+    // Avrunda totalpriset
     public static double roundToNearestHalf(double value) {
         return Math.round(value * 2) / 2.0;
     }
+    // Kalkyleringsmetoden(Promotion)
     static double calculatePrice(Product product, double quantity) {
         double price = product.getPrice();
         double totalPrice;
@@ -43,7 +45,7 @@ public class CartItem {
                 // Använd kampanjpris om överstiger 0
                 totalPrice = product.getPromotionPrice() * quantity;
             } else {
-                // Andra kampanjer kan komma att läggas till här
+                //  Obs!Andra kampanjer kan komma att läggas till här
                 totalPrice = price * quantity;
             }
         } else {
