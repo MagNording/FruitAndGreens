@@ -26,7 +26,7 @@ public class UserInput {
     }
 
     public static int readInt() {
-        int intValue = 0;
+        int intValue;
         while (true) {
             try {
                 String inputLine = input.nextLine();
@@ -34,7 +34,11 @@ public class UserInput {
                     System.out.println("Ingen inmatning gjord, försök igen.");
                 } else {
                     intValue = Integer.parseInt(inputLine);
-                    break;
+                    if (intValue < 0) {
+                        System.out.println("Värdet måste vara positivt, försök igen.");
+                    } else {
+                        break;
+                    }
                 }
             } catch (NumberFormatException e) {
                 System.out.println("Felaktig inmatning, försök igen.");
@@ -50,11 +54,16 @@ public class UserInput {
             userInput = userInput.replace(",", ".");
             try {
                 doubleValue = Double.parseDouble(userInput);
-                return doubleValue;
+                if (doubleValue < 0) {
+                    System.out.println("Värdet måste vara positivt, försök igen.");
+                } else {
+                    return doubleValue;
+                }
             } catch (NumberFormatException nfe) {
                 System.out.println("Felaktig inmatning, försök igen.");
             }
         }
     }
+
 
 }

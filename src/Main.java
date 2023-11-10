@@ -7,19 +7,22 @@ import java.util.*;
 public class Main {
     public static ArrayList<Product> allProducts = new ArrayList<>(); // ArrayList allProducts
     public static List<CartItem> shoppingCart = new ArrayList<>();
+    static String GREEN = "\u001B[32m";
+    static String PURPLE = "\u001B[95m";
+    static String RESET = "\u001B[0m";
     public static boolean isAdmin = false; // isAdmin
     public static void main(String[] args) {
 
         boolean exitMenu = false;
         // Presentation layer
-        System.out.println("Välkommen till FRUKT OCH GRÖNT"); // Program start
+        System.out.println(PURPLE + "Välkommen till FRUKT OCH GRÖNT"); // Program start
         System.out.println("------------------------------");
-        System.out.println("Programmet startas.\n");
+        System.out.println("Programmet startas.\n" + RESET);
 
         theProducts();
 
         do {
-            System.out.println(isAdmin ? "Användare: ADMIN" : "Användare: KUND");
+            System.out.println(isAdmin ? GREEN + "Användare: ADMIN" : PURPLE + "Användare: KUND");
             displayMenu();
             System.out.print("Ange ditt menyval: ");
             int menuChoice = UserInput.readInt();
@@ -205,17 +208,16 @@ public class Main {
     private static boolean isValidProductIndex(int index) {
         return index >= 0 && index < allProducts.size();
     }
-    private static boolean confirmAddToCart() {
-        System.out.println("Vill du lägga till denna produkt i din varukorg? (j/n): ");
-        return UserInput.readString().equalsIgnoreCase("j");
-    }
     private static double requestQuantity(Product product) {
         // Fråga användaren efter kvantiteten
-        System.out.println("Ange " + (product.isWeightPrice() ? "vikten du önskar köpa (i kg): " :
+        System.out.print("Ange " + (product.isWeightPrice() ? "vikten du önskar köpa (i kg): " :
                 "antalet enheter du önskar köpa: "));
         return product.isWeightPrice() ? UserInput.readDouble() : UserInput.readInt();
     }
-
+    private static boolean confirmAddToCart() {
+        System.out.print("Vill du lägga till denna produkt i din varukorg? (j/n): ");
+        return UserInput.readString().equalsIgnoreCase("j");
+    }
     private static void addOrUpdateCartItem(Product selectedProduct, double quantity) {
         CartItem existingItem = findCartItemByProduct(selectedProduct);
         if (existingItem != null) {
@@ -513,7 +515,7 @@ public class Main {
 
     // Lägg till en kampanj
     public static void manageCampaign(Product product) {
-        System.out.println("1. Aktivera/Deaktivera kampanj\n2. Uppdatera kampanjpris\n> ");
+        System.out.print("1. Aktivera/Deaktivera kampanj\n2. Uppdatera kampanjpris\n> ");
         int campaignChoice = UserInput.readInt();
         switch (campaignChoice) {
             case 1 -> toggleCampaignStatus(product);
@@ -606,7 +608,7 @@ public class Main {
                 0.0, true));
 
         allProducts.add(new Product("Kiwi", 5, new String[]{"FRUKT"}, false,
-                3.50, false));
+                0.0, false));
 
         allProducts.add(new Product("Morot", 16.48, new String[]{"GRÖNSAK", "ROTFRUKT"}, true));
         allProducts.add(new Product("Broccoli", 18.83, new String[]{"GRÖNSAK", "KÅL"}, true));
