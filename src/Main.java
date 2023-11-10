@@ -37,18 +37,18 @@ public class Main {
                 case 5 -> { if (isAdmin) { addNewProduct(); } else { printAdminOnly(); } }
                 case 6 -> { if (isAdmin) { removeProduct(); } else { printAdminOnly(); } }
                 case 7 -> { if (isAdmin) { updateProduct(); } else { printAdminOnly(); } }
-                case 8 -> {
-                    if (!isAdmin) {
-                        isAdmin = adminLogin();
-                    } else {
-                        System.out.println("Vänligen, välj mellan 0 - 7");
-                    }
+                case 8 -> { if (!isAdmin) { isAdmin = adminLogin(); } else {
+                        System.out.println("Vänligen, välj mellan 0 - 7 eller logga ut."); }}
+                case 9 -> { if (isAdmin) { isAdmin = false;
+                    System.out.println("Du har loggats ut som admin.");
+                } else {
+                    System.out.println("Ogiltigt val, försök igen.");}
                 }
                 default -> {
                     if (isAdmin) {
-                        System.out.println("Ogiltigt val, välj mellan 0 - 7.");
+                        System.out.println("Vänligen, välj mellan 0 - 7 eller logga ut.");
                     } else {
-                        System.out.println("Ogiltigt val, välj mellan 0 - 8.");
+                        System.out.println("Vänligen välj mellan 0 - 8.");
                     }
                 }
             }
@@ -77,7 +77,9 @@ public class Main {
         for (String choice : menu) {
             System.out.println(choice);
         }
-        if (!isAdmin) {
+        if (isAdmin) {
+            System.out.println("9. Logga ut som Admin.");
+        } else {
             System.out.println("8. Logga in som Admin.");
         }
     }
@@ -494,10 +496,11 @@ public class Main {
         ArrayList<String> userDataFromFile = readUserDataFromFile();
 
         boolean loggedIn = false;
+        System.out.println("ADMIN LOGIN:");
         do {
-            System.out.print("Ange användarnamn > ");
+            System.out.print("Ange användarnamn: ");
             String usernameInput = UserInput.readString();
-            System.out.print("Ange lösenord > ");
+            System.out.print("Ange lösenord: ");
             String passwordInput = UserInput.readString();
             // Jämför användarnamn och lösenord med de som lästs in från filen
             if (userDataFromFile.size() >= 2 &&
