@@ -68,16 +68,10 @@ public class CartItem {
             } else if (product.isBuyTwoGetOne()) {
                 promotionInfo = " (Köp två betala för en)";
             }
-            // Anta att totalPrice har justerats för att reflektera kampanjen
         }
 
         return String.format("Produkt: %-10s Kvantitet: %5.2f %s %s Summa: %.2f kr%s",
                 product.getName(), quantity, unit, priceInfo, totalPrice, promotionInfo);
     }
-
-
-
-
-
-
+    
 }
