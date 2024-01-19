@@ -1,16 +1,20 @@
 // magnus nording, magnus.nording@iths.se
+
 import utils.UserInput;
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.*;
 
 public class Main {
     public static ArrayList<Product> allProducts = new ArrayList<>(); // ArrayList allProducts
     public static List<CartItem> shoppingCart = new ArrayList<>();
-    static String GREEN = "\u001B[32m";
-    static String PURPLE = "\u001B[95m";
-    static String RESET = "\u001B[0m";
+    private static final String GREEN = "\u001B[32m";
+    private static final String PURPLE = "\u001B[95m";
+    private static final String RESET = "\u001B[0m";
     public static boolean isAdmin = false; // isAdmin
+
     public static void main(String[] args) {
 
         boolean exitMenu = false;
@@ -37,10 +41,11 @@ public class Main {
                 case 5 -> { if (isAdmin) { addNewProduct(); } else { printAdminOnly(); } }
                 case 6 -> { if (isAdmin) { removeProduct(); } else { printAdminOnly(); } }
                 case 7 -> { if (isAdmin) { updateProduct(); } else { printAdminOnly(); } }
-                case 8 -> { if (!isAdmin) { isAdmin = adminLogin(); } else {
-                        System.out.println("Vänligen, välj mellan 0 - 7 eller logga ut."); }}
+                case 8 -> { if (!isAdmin) { isAdmin = adminLogin(); shoppingCart.clear();
+                } else { System.out.println("Vänligen, välj mellan 0 - 7 eller logga ut."); }}
                 case 9 -> { if (isAdmin) { isAdmin = false;
                     System.out.println("Du har loggats ut som admin.");
+                    shoppingCart.clear();
                 } else {
                     System.out.println("Ogiltigt val, försök igen.");}
                 }
@@ -52,11 +57,14 @@ public class Main {
                     }
                 }
             }
-
             System.out.println();
         } while (!exitMenu);
-
-        System.out.println("Tack, programmet avslutas."); // Program End
+        // Program End
+        if (!isAdmin) {
+            System.out.println("Tack, välkommen åter!");
+            endOfProgram();
+        } else
+            endOfProgram();
     }
 
     private static void printAdminOnly() {
@@ -236,12 +244,16 @@ public class Main {
 
     // 4. Visa varukorg
     public static void displayShoppingCart() {
-        System.out.println("VARUKORG:");
+        LocalDateTime now = LocalDateTime.now();
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy/MM/dd HH:mm:ss");
+        String formattedDateTime = now.format(formatter);
+        System.out.println("VARUKORG \t" + formattedDateTime);
         if (!shoppingCart.isEmpty()) {
+            System.out.println(new String(new char[100]).replace("\0", "-"));
             for (CartItem item : shoppingCart) {
                 System.out.println(item);
             }
-            System.out.println(new String(new char[75]).replace("\0", "-"));
+            System.out.println(new String(new char[100]).replace("\0", "-"));
             displayCartSummary();
             shoppingCartMenu();
         } else {
@@ -309,7 +321,7 @@ public class Main {
             System.out.println("Varukorgen är redan tom.");
             return;
         }
-        shoppingCart = new ArrayList<>();
+        shoppingCart.clear();
         System.out.println("Varukorgen är nu tom.");
     }
 
@@ -327,7 +339,7 @@ public class Main {
         for (CartItem item : shoppingCart) {
             totalPrice += item.getTotalPrice();
         }
-        totalPrice = CartItem.roundToNearestHalf(totalPrice);
+        totalPrice = CartItem.roundPriceToNearestHalf(totalPrice);
         System.out.printf("Totalpris: %.2f kr\n", totalPrice);
     }
 
@@ -617,4 +629,16 @@ public class Main {
         allProducts.add(new Product("Broccoli", 18.83, new String[]{"GRÖNSAK", "KÅL"}, true));
     }
 
+    // ProgramAvslut
+    public static void endOfProgram() {
+        System.out.print("Programmet avslutas");
+        for (int i = 0; i < 5; i++) {
+            try {
+                Thread.sleep(800);
+            } catch (InterruptedException e) {
+                throw new RuntimeException(e);
+            }
+            System.out.print(".");
+        }
+    }
 }

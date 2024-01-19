@@ -24,10 +24,10 @@ public class CartItem {
         this.quantity = quantity;
     }
     public void setTotalPrice(double totalPrice) {
-        this.totalPrice = roundToNearestHalf(totalPrice);
+        this.totalPrice = roundPriceToNearestHalf(totalPrice);
     }
     // Avrunda totalpriset
-    public static double roundToNearestHalf(double value) {
+    public static double roundPriceToNearestHalf(double value) {
         return Math.round(value * 2) / 2.0;
     }
     // Kalkyleringsmetoden(Promotion)
@@ -73,5 +73,10 @@ public class CartItem {
         return String.format("Produkt: %-10s Kvantitet: %5.2f %s %s Summa: %.2f kr%s",
                 product.getName(), quantity, unit, priceInfo, totalPrice, promotionInfo);
     }
-    
+
+
+
+
+
+
 }
