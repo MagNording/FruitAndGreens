@@ -32,31 +32,8 @@ public class Main {
             int menuChoice = UserInput.readInt();
             System.out.println();
 
-            switch (menuChoice) {
-                case 0 -> exitMenu = true;
-                case 1 -> displayAllProducts();
-                case 2 -> searchProduct();
-                case 3 -> addToShoppingCart();
-                case 4 -> displayShoppingCart();
-                case 5 -> { if (isAdmin) { addNewProduct(); } else { printAdminOnly(); } }
-                case 6 -> { if (isAdmin) { removeProduct(); } else { printAdminOnly(); } }
-                case 7 -> { if (isAdmin) { updateProduct(); } else { printAdminOnly(); } }
-                case 8 -> { if (!isAdmin) { isAdmin = adminLogin(); shoppingCart.clear();
-                } else { System.out.println("Vänligen, välj mellan 0 - 7 eller logga ut."); }}
-                case 9 -> { if (isAdmin) { isAdmin = false;
-                    System.out.println("Du har loggats ut som admin.");
-                    shoppingCart.clear();
-                } else {
-                    System.out.println("Ogiltigt val, försök igen.");}
-                }
-                default -> {
-                    if (isAdmin) {
-                        System.out.println("Vänligen, välj mellan 0 - 7 eller logga ut.");
-                    } else {
-                        System.out.println("Vänligen välj mellan 0 - 8.");
-                    }
-                }
-            }
+            exitMenu = menuMethods(menuChoice, exitMenu);
+
             System.out.println();
         } while (!exitMenu);
         // Program End
@@ -90,6 +67,36 @@ public class Main {
         } else {
             System.out.println("8. Logga in som Admin.");
         }
+    }
+
+    // Switchen
+    public static boolean menuMethods(int menuChoice, boolean exitMenu) {
+        switch (menuChoice) {
+            case 0 -> exitMenu = true;
+            case 1 -> displayAllProducts();
+            case 2 -> searchProduct();
+            case 3 -> addToShoppingCart();
+            case 4 -> displayShoppingCart();
+            case 5 -> { if (isAdmin) { addNewProduct(); } else { printAdminOnly(); } }
+            case 6 -> { if (isAdmin) { removeProduct(); } else { printAdminOnly(); } }
+            case 7 -> { if (isAdmin) { updateProduct(); } else { printAdminOnly(); } }
+            case 8 -> { if (!isAdmin) { isAdmin = adminLogin(); shoppingCart.clear();
+            } else { System.out.println("Vänligen, välj mellan 0 - 7 eller logga ut."); }}
+            case 9 -> { if (isAdmin) { isAdmin = false;
+                System.out.println("Du har loggats ut som admin.");
+                shoppingCart.clear();
+            } else {
+                System.out.println("Ogiltigt val, försök igen.");}
+            }
+            default -> {
+                if (isAdmin) {
+                    System.out.println("Vänligen, välj mellan 0 - 7 eller logga ut.");
+                } else {
+                    System.out.println("Vänligen välj mellan 0 - 8.");
+                }
+            }
+        }
+        return exitMenu;
     }
 
     // 1. Visa alla tillagda produkter
@@ -634,7 +641,7 @@ public class Main {
         System.out.print("Programmet avslutas");
         for (int i = 0; i < 5; i++) {
             try {
-                Thread.sleep(800);
+                Thread.sleep(600);
             } catch (InterruptedException e) {
                 throw new RuntimeException(e);
             }
